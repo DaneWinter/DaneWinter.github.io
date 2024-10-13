@@ -1,0 +1,17 @@
+---
+title: "About"
+image: profile.jpg
+about:
+  template: jolla
+  links:
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/dane-winterboer-965554259
+      target: _blank
+    - icon: github
+      text: Github
+      href: https://github.com/DaneWinter
+      target: _blank
+---
+
+About this blog
