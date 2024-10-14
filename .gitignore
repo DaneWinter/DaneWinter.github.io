@@ -46,3 +46,6 @@ po/*~
 rsconnect/
 
 /.quarto/
+
+# Raw data files
+/data
