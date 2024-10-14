@@ -48,4 +48,4 @@ rsconnect/
 /.quarto/
 
 # Raw data files
-data\
+data/
