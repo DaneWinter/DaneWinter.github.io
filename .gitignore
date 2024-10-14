@@ -49,3 +49,4 @@ rsconnect/
 
 # Raw data files
 data/
+.DS_Store
