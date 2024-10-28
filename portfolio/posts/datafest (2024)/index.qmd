@@ -1,0 +1,1152 @@
+---
+title: "Mizzou Datafest 2024: Best-in-Show Submission"
+author: "Dane Winterboer"
+date: "2024-4-10"
+categories: [R, Competition, Data Visualization, Machine Learning, Modeling, Exploratory Analysis]
+image: "thumbnail.png"
+description: "An Analysis of Student Success Indicators in CourseKata Online Textbooks"
+code-fold: true
+code-summary: "Show Code"
+toc: true
+toc-depth: 2
+---
+
+## Project Information
+
+The following analysis was the [best-in-show submission](https://datafest.stat.missouri.edu/datafest2024/result.html){.external target="_blank"} for Mizzou's 2024 Datafest competition. 
+
+American Statistical Association (ASA) DataFest is a celebration of data in which teams of undergraduates work "around the clock" to discover and share meaning in a large, rich, and complex data set provided by a corporate sponsor. It is a nationally coordinated weekend-long data analysis competition and challenges students to find their own story to tell with the data that is meaningful to the data donor. Teams are given only 22 hours to explore the data, identity meaningful insights, and create visualizations and reports to present to a panel of judges. 
+
+Credit to everyone else on the Truman State DataFest team, .gif or .gif: Evan AuBuchon, Nathan Bresette, and Severin Hussey. It was a tremendous experience to work with all of them to produce the following analysis. 
+
+## Data
+
+All data for this analysis was provided by CourseKata, an online Statistics & Data Science curriculum for college and high school students. Our clients, CourseKata curriculum writers, tasked our team with analyzing student attitude and its effect on a student's behavior and performance. To do this, the CourseKata team gave us access to 6 tables of data.
+
+1.  The page_views table contained information about student usage of the textbook, i.e. engagement statistics, idle time statistics, access dates, etc.
+
+2.  The responses table contained information about student response to questions within the online circular, i.e. question type, question answer, number of correct answers, etc.
+
+3.  The media_views table contained infomation about student usage of specific media formats in the online books. Particularly, the table gathers information about how students utilized the video based course material.
+
+4.  The items table contains information about individual questions and "items" within the different books, i.e. question formats, number of questions, etc.
+
+5.  The checkpoints_pulse table contained student attitudinal data. Specifically, at the beginning of every chapter students were tasked with taking "pulse survey" which would record their attitudes towards the previous chapter. This table is where we focused a majority of our initial analysis as the clients were invested in understanding student attitude towards the online material.
+
+6.  The checkpoints_eoc table contained student performance data. Specifically, how the student preformed on end of chapter assessments.
+
+```{r, warning=FALSE}
+#| echo: false
+#| output: false
+
+
+#Import data
+library(tidyverse)
+page_views <- read.csv("data/page_views.csv")
+#View(page_views)
+
+responses <- read.csv("data/responses.csv")#View(responses_sample)
+#View(responses)
+
+media_views <- read.csv("data/media_views.csv")
+#View(media_views)
+
+items <- read.csv("data/items.csv")
+#View(items)
+
+checkpoints_pulse <- read.csv("data/checkpoints_pulse.csv")
+#View(checkpoints_pulse)
+
+checkpoints_eoc <- read.csv("data/checkpoints_eoc.csv")
+#View(checkpoints_eoc)
+```
+
+## Exploratory Analysis
+
+### Disclaimer
+
+The section is a gestalt exploratory analysis from the efforts of all four individual team members. Thus, the following code is composed of four different coding styles. For this section, written code may be difficult to follow; however, the objective of this section is to give the reader an introduction to the project and insight to how our group attempted to explore the data.
+
+All following sections of the project were written and complied by me, thus, if the reader is interested in following reproducible code and uninterested in the exploratory analysis, I suggest skipping ahead to the **Cleaning and Engineering** section.
+
+### Initial Exploratory Goals
+
+Our initial goals were...
+
+-   Identify differences among student attitudes
+
+-   Understand what caused these difference in student attitudes
+
+-   Identify if student attitudes affected student performance
+
+### Prefatory Data Cleaning & Engineering
+
+Simple, prefatory data engineering had to occur in order to preform exploratory analysis. For a full breakdown of our final data cleaning and engineering protocol, see the **Cleaning & Engineering** section.
+
+```{r, warning=FALSE}
+#| output: false
+
+
+eoc_agg <- checkpoints_eoc %>%
+  mutate(avg_attempt = n_attempt/n_possible) %>% 
+  filter(book == "College / Statistics and Data Science (ABC)", !is.na(EOC)) %>% 
+  select(-c(n_possible,n_correct,n_attempt,book))
+
+page_agg <- page_views %>%
+  filter(book == "College / Statistics and Data Science (ABC)") %>%
+  mutate(idle = idle_brief + idle_long) %>%
+  mutate(off_page = off_page_brief + off_page_long) %>%
+  select(student_id, chapter_number, release, engaged, idle, off_page, tried_again_clicks, institution_id) %>%
+  group_by(student_id, chapter_number, release) %>%
+  summarise(engaged_sum = sum(engaged, na.rm = TRUE),
+            idle_sum = sum(idle, na.rm = TRUE) / 60000,
+            off_page_sum = sum(off_page, na.rm = TRUE) / 60000,
+            tried_again_clicks_sum = sum(tried_again_clicks, na.rm = TRUE))
+
+total_table <- left_join(eoc_agg,page_agg, by = c("student_id","chapter_number"))
+
+total_table$off_page_sum <- format(total_table$off_page_sum, scientific = FALSE)
+```
+
+```{r, warning=FALSE}
+#| output: false
+
+
+pulse <- checkpoints_pulse %>% 
+  mutate(cost = ifelse(construct == "Cost", response, NA)) %>% 
+  mutate(expectancy = ifelse(construct == "Expectancy", response, NA)) %>% 
+  mutate(intrinsic = ifelse(construct == "Intrinsic Value", response, NA)) %>% 
+  mutate(utility = ifelse(construct == "Utility Value", response, NA)) %>%
+  filter(response != "")
+
+pulse <- pulse %>% group_by(student_id, chapter_number) %>%
+  summarize(cost = mean(cost, na.rm = TRUE), 
+            expectancy = mean(expectancy, na.rm = TRUE), 
+            intrinsic = mean(intrinsic, na.rm = TRUE), 
+            utility = mean(utility, na.rm = TRUE)) %>%
+  filter(cost != 3.5,expectancy != 3.5)
+
+full_pulse <- full_join(total_table, pulse, by = c("student_id","chapter_number"))
+
+checkpoints_pulse <- checkpoints_pulse %>%  mutate(class_id = case_when(class_id == "0089dedf-6316-4c32-a38c-d48dfafed882" ~ "C-01",
+                              class_id == "074123e7-cd90-4500-86fe-286aaa733bf5" ~ "C-02",
+                              class_id == "0d546479-6f77-4477-9c7e-365cd36c97eb" ~ "C-03",
+                              class_id == "1020418a-3eeb-4251-88f7-150c8fe00a56" ~ "C-04",
+                              class_id == "103f5ce8-9e95-4916-815e-9f821d274a59" ~ "C-05",
+                              class_id == "1cca9f91-5c4a-4e1a-8e0e-293b070dfd6f" ~ "C-06",
+                              class_id == "20bd524c-bb2d-4b74-a419-929475b91d94" ~ "C-07",
+                              class_id == "2294d558-6f5d-41c5-8d28-7b5280970f95" ~ "C-08",
+                              class_id == "3631cec9-51d3-4237-906f-a142a715be51" ~ "C-09",
+                              class_id == "40e49bfa-f6cb-42fa-a3a4-b23592b799ec" ~ "C-10",
+                              class_id == "4a3b5b2c-ef0f-4121-96f4-fd8a42764836" ~ "C-11",
+                              class_id == "51711479-441b-4c02-aef7-517aca63a53f" ~ "C-12",
+                              class_id == "52619962-72f6-4716-9c64-1c06fe10f739" ~ "C-13",
+                              class_id == "552ede8f-6b54-426d-8d29-abdc43a668cb" ~ "C-14",
+                              class_id == "5bd961c4-659c-40a7-a685-6735189f2b65" ~ "C-15",
+                              class_id == "60e05fa5-c986-4973-9833-16238720b727" ~ "C-16",
+                              class_id == "65246c1e-a176-4760-acb5-a320a9b7b2fe" ~ "C-17",
+                              class_id == "686478e7-82ac-4e6c-a3ec-2da0076ef868" ~ "C-18",
+                              class_id == "79662249-02f6-48d8-aa99-1e1c0aeea77d" ~ "C-19",
+                              class_id == "7a987176-7e55-45b5-a715-7f56c59d5f49" ~ "C-20",
+                              class_id == "822d72d9-0c18-47a0-99fc-7223b4fd22f5" ~ "C-21",
+                              class_id == "8589cd83-192c-44c8-b649-cd848e519530" ~ "C-22",
+                              class_id == "94da41a4-f9f8-4225-bf41-42db737850b9" ~ "C-23",
+                              class_id == "97c61e74-5a20-4cf5-bf67-8f8db750d0e7" ~ "C-24",
+                              class_id == "98119d92-8cc6-416a-972c-630351726223" ~ "C-25",
+                              class_id == "9bdf8bfc-9998-4fd8-85d2-70c91cf94891" ~ "C-26",
+                              class_id == "9fad0c9e-9d3d-4eed-ada6-3959bd6d712c" ~ "C-27",
+                              class_id == "afcb6b4e-a0c0-46ce-b38c-c96329c91471" ~ "C-28",
+                              class_id == "b1421b49-4026-4c61-9786-d4ef110c8db3" ~ "C-29",
+                              class_id == "b16b895d-ca1d-4330-a36d-c43fb33436e5" ~ "C-30",
+                              class_id == "bc650f4f-11f0-439a-a90a-47726724c811" ~ "C-31",
+                              class_id == "bcae937d-c95f-436c-ac0f-d4a5e995de19" ~ "C-32",
+                              class_id == "c09145c1-d635-41ae-b881-17ab46895fe4" ~ "C-33",
+                              class_id == "c1168ee3-7ac8-4fdc-af0e-e375ad0629fe" ~ "C-34",
+                              class_id == "c7008a64-b43c-4eb4-bebf-07b08b9894ad" ~ "C-35",
+                              class_id == "cc1ffb2e-5555-4109-8ad8-2d49cb54ad10" ~ "C-36",
+                              class_id == "d0b4f5e2-6d8f-4828-91cd-3f4714b821b0" ~ "C-37",
+                              class_id == "fe8c4185-7e8d-48eb-bf0e-85562e060d5d" ~ "C-38"))
+```
+
+### Graphs for Pulse, Attitudinal, Data
+
+As noted above, our main interest was trying to variables that could explain and/or correlate with student attitudes (or vise versa). However, as the dozens of graphs and correlates bellow will illustrate, no such correlation exists. Even the few relationships that appear to exist, have such a low correlation value that they are not worth investigating.
+
+```{r, warning=FALSE}
+library(wesanderson) # graph colors
+ggplot(full_pulse, aes(x = cost, y = EOC)) +
+  theme_minimal() +
+  geom_violin(aes(color = as.factor(cost))) +
+  geom_boxplot(aes(fill = as.factor(cost)), width = 0.4, outliers = F) +
+  scale_fill_manual(values = wes_palette(name = "Darjeeling1",n=7, type = "continuous")) +
+  scale_color_manual(values = wes_palette(name = "Darjeeling1",n=7, type = "continuous")) +
+  theme(legend.position = "none")
+
+eoc_cost <- lm(EOC ~ cost, full_pulse)
+summary(eoc_cost)
+
+ggplot(full_pulse, aes(x = expectancy, y = EOC)) +
+  theme_minimal() +
+  geom_violin(aes(color = as.factor(expectancy))) +
+  geom_boxplot(aes(fill = as.factor(expectancy)), width = 0.4, outliers = F) +
+  scale_fill_manual(values = wes_palette(name = "Darjeeling1",n=7, type = "continuous")) +
+  scale_color_manual(values = wes_palette(name = "Darjeeling1",n=7, type = "continuous")) +
+  theme(legend.position = "none")
+
+eoc_exp <- lm(EOC ~ expectancy, full_pulse)
+summary(eoc_exp)
+
+ggplot(full_pulse, aes(x = intrinsic, y = EOC)) +
+  theme_minimal() +
+  geom_violin(aes(color = as.factor(intrinsic))) +
+  geom_boxplot(aes(fill = as.factor(intrinsic)), width = 0.4, outliers = F) +
+  scale_fill_manual(values = wes_palette(name = "Darjeeling1",n=7, type = "continuous")) +
+  scale_color_manual(values = wes_palette(name = "Darjeeling1",n=7, type = "continuous")) +
+  theme(legend.position = "none")
+
+eoc_int <- lm(EOC ~ intrinsic, full_pulse)
+summary(eoc_int)
+
+ggplot(full_pulse, aes(x = utility, y = EOC)) +
+  theme_minimal() +
+  geom_violin(aes(color = as.factor(utility))) +
+  geom_boxplot(aes(fill = as.factor(utility)), width = 0.4, outliers = F) +
+  scale_fill_manual(values = wes_palette(name = "Darjeeling1",n=7, type = "continuous")) +
+  scale_color_manual(values = wes_palette(name = "Darjeeling1",n=7, type = "continuous")) +
+  theme(legend.position = "none")
+
+eoc_util <- lm(EOC ~ utility, full_pulse)
+summary(eoc_util)
+```
+
+```{r, warning=FALSE}
+ggplot(full_pulse, aes(y = (avg_attempt)^-5, x = cost)) +
+  theme_minimal() +
+  geom_violin(aes(color = as.factor(cost))) +
+  geom_boxplot(aes(fill = as.factor(cost)), width = 0.4, outliers = F) +
+  scale_fill_manual(values = wes_palette(name = "Darjeeling1",n=7, type = "continuous")) +
+  scale_color_manual(values = wes_palette(name = "Darjeeling1",n=7, type = "continuous")) +
+  theme(legend.position = "none")
+
+att_cost <- lm((avg_attempt)^-5 ~ cost, full_pulse)
+summary(att_cost)
+
+ggplot(full_pulse, aes(y = (avg_attempt)^-5, x = expectancy)) +
+  theme_minimal() +
+  geom_violin(aes(color = as.factor(expectancy))) +
+  geom_boxplot(aes(fill = as.factor(expectancy)), width = 0.4, outliers = F) +
+  scale_fill_manual(values = wes_palette(name = "Darjeeling1",n=7, type = "continuous")) +
+  scale_color_manual(values = wes_palette(name = "Darjeeling1",n=7, type = "continuous")) +
+  theme(legend.position = "none")
+
+att_exp <- lm((avg_attempt)^-5 ~ expectancy, full_pulse)
+summary(att_exp)
+
+ggplot(full_pulse, aes(y = (avg_attempt)^-5, x = intrinsic)) +
+  theme_minimal() +
+  geom_violin(aes(color = as.factor(intrinsic))) +
+  geom_boxplot(aes(fill = as.factor(intrinsic)), width = 0.4, outliers = F) +
+  scale_fill_manual(values = wes_palette(name = "Darjeeling1",n=7, type = "continuous")) +
+  scale_color_manual(values = wes_palette(name = "Darjeeling1",n=7, type = "continuous")) +
+  theme(legend.position = "none")
+
+att_int <- lm((avg_attempt)^-5 ~ intrinsic, full_pulse)
+summary(att_int)
+
+ggplot(full_pulse, aes(y = (avg_attempt)^-5, x = utility)) +
+  theme_minimal() +
+  geom_violin(aes(color = as.factor(utility))) +
+  geom_boxplot(aes(fill = as.factor(utility)), width = 0.4, outliers = F) +
+  scale_fill_manual(values = wes_palette(name = "Darjeeling1",n=7, type = "continuous")) +
+  scale_color_manual(values = wes_palette(name = "Darjeeling1",n=7, type = "continuous")) +
+  theme(legend.position = "none")
+
+att_util <- lm((avg_attempt)^-5 ~ utility, full_pulse)
+summary(att_util)
+```
+
+```{r, warning=FALSE}
+full_pulse <- full_pulse %>%
+  filter(cost != 3.5)
+ggplot(full_pulse, aes(y = log(engaged_sum), x = cost)) +
+  theme_minimal() +
+  geom_violin(aes(color = as.factor(cost))) +
+  geom_boxplot(aes(fill = as.factor(cost)), width = .4, outliers = F) +
+  scale_fill_manual(values = wes_palette(name = "Darjeeling1", n = 7, type = "continuous")) +
+  scale_color_manual(values = wes_palette(name = "Darjeeling1", n = 7, type = "continuous"))
+
+eng_cost <- lm(engaged_sum ~ cost, full_pulse)
+summary(eng_cost)
+
+ggplot(full_pulse, aes(y = log(engaged_sum), x = expectancy)) +
+  theme_minimal() +
+  geom_violin(aes(color = as.factor(expectancy))) +
+  geom_boxplot(aes(fill = as.factor(expectancy)), width = .4, outliers = F) +
+  scale_fill_manual(values = wes_palette(name = "Darjeeling1", n = 7, type = "continuous")) +
+  scale_color_manual(values = wes_palette(name = "Darjeeling1", n = 7, type = "continuous"))
+
+eng_exp <- lm(engaged_sum ~ expectancy, full_pulse)
+summary(eng_exp)
+
+ggplot(full_pulse, aes(y = log(engaged_sum), x = intrinsic)) +
+  theme_minimal() +
+  geom_violin(aes(color = as.factor(intrinsic))) +
+  geom_boxplot(aes(fill = as.factor(intrinsic)), width = .4, outliers = F) +
+  scale_fill_manual(values = wes_palette(name = "Darjeeling1", n = 7, type = "continuous")) +
+  scale_color_manual(values = wes_palette(name = "Darjeeling1", n = 7, type = "continuous"))
+
+eng_int <- lm(engaged_sum ~ intrinsic, full_pulse)
+summary(eng_int)
+
+ggplot(full_pulse, aes(y = log(engaged_sum), x = utility)) +
+  theme_minimal() +
+  geom_violin(aes(color = as.factor(utility))) +
+  geom_boxplot(aes(fill = as.factor(utility)), width = .4, outliers = F) +
+  scale_fill_manual(values = wes_palette(name = "Darjeeling1", n = 7, type = "continuous")) +
+  scale_color_manual(values = wes_palette(name = "Darjeeling1", n = 7, type = "continuous"))
+
+eng_util <- lm(engaged_sum ~ utility, full_pulse)
+summary(eng_util)
+```
+
+### Last Ditch Effort
+
+As one more try to find meaning insight within the pulse question answers, one of our team mates even preformed some feature engineering to create new variables with the student attitudinal data (one example can be seen in the following code chunk). Similarly, it did not reveal any meaningful insight.
+
+```{r, warning=FALSE}
+#Boxplot of created combo variable with a fill of construct
+check <- checkpoints_pulse %>% mutate(combo = paste(construct, chapter_number, sep = " "))
+
+ggplot(check, aes(x=combo,y=response, fill = construct)) + 
+  geom_boxplot(outliers = F) +
+  theme_minimal() +
+  labs(title = "Boxplot of Pulse Responses by Construct and Chapter") +
+  scale_fill_manual(values = wes_palette(name="Darjeeling1",n=4,type = "discrete")) +
+  theme(legend.position = "none",axis.text.x=element_text(angle=45),plot.title = element_text(hjust = 0.5))
+```
+
+```{r, warning=FALSE}
+ggplot(checkpoints_pulse, aes(y = response, fill = construct)) +
+  theme_minimal() +
+  geom_boxplot(outliers = F) +
+  facet_wrap(~class_id)  +
+  scale_fill_manual(values = wes_palette(name = "Darjeeling1", n = 4, type = "discrete"))
+```
+
+### New Exploratory Goals
+
+Since investigating subjective, student attitudinal responses lead to no significant insights, we decided to shift our analysis to focus on student performance. Thus, our new exploratory goals were...
+
+-   find identifiers for student success.
+
+-   determine what an "excelling" student is and what a "struggling" student is.
+
+-   identity the differences between excelling and struggling students.
+
+### Difference Between Books
+
+Since the data frame contained three books, we wanted to check if the book affected student EOC scores.
+
+```{r, warning=FALSE}
+#Boxplot and violin plot of books by EOC
+ggplot(checkpoints_eoc, aes(x = book, y = EOC)) +
+  geom_violin(fill = "lightblue", color = "blue", alpha = 0.5) +
+  geom_boxplot() +
+  labs(x = "Books",
+       title = "Books by EOC") +
+  scale_x_discrete(labels = c("College (ABC)", "Advanced College (ABCD)", "High School")) +
+  theme(plot.title = element_text(hjust = 0.5)) 
+```
+
+From the plot it appears that the book does causes a difference in median EOC score, especially when comparing the College (ABC) book to the High School book. Since there was a difference in score, and the books contained chapter numbers and material, we decided to only analysis the EOC scores of students who utilized the College (ABC) book. This was our decision due to the College (ABC) book having the more students using it than the other two books, meaning we were retain a larger sample size.
+
+The rest of this analysis is thus only for the College (ABC) book and its various versions.
+
+### Futher Exploration of EOC Scores/Student Performance 
+
+```{r, warning=FALSE}
+eoc <- checkpoints_eoc %>% filter(book == "College / Statistics and Data Science (ABC)")
+eoc <- eoc %>% filter(EOC != "")
+eoc <- eoc %>% mutate(avg_try = n_attempt/n_possible)
+
+eoc <- eoc %>%  mutate(class_id = case_when(class_id == "0089dedf-6316-4c32-a38c-d48dfafed882" ~ "C-01",
+                              class_id == "074123e7-cd90-4500-86fe-286aaa733bf5" ~ "C-02",
+                              class_id == "0d546479-6f77-4477-9c7e-365cd36c97eb" ~ "C-03",
+                              class_id == "1020418a-3eeb-4251-88f7-150c8fe00a56" ~ "C-04",
+                              class_id == "103f5ce8-9e95-4916-815e-9f821d274a59" ~ "C-05",
+                              class_id == "1cca9f91-5c4a-4e1a-8e0e-293b070dfd6f" ~ "C-06",
+                              class_id == "20bd524c-bb2d-4b74-a419-929475b91d94" ~ "C-07",
+                              class_id == "2294d558-6f5d-41c5-8d28-7b5280970f95" ~ "C-08",
+                              class_id == "3631cec9-51d3-4237-906f-a142a715be51" ~ "C-09",
+                              class_id == "40e49bfa-f6cb-42fa-a3a4-b23592b799ec" ~ "C-10",
+                              class_id == "4a3b5b2c-ef0f-4121-96f4-fd8a42764836" ~ "C-11",
+                              class_id == "51711479-441b-4c02-aef7-517aca63a53f" ~ "C-12",
+                              class_id == "52619962-72f6-4716-9c64-1c06fe10f739" ~ "C-13",
+                              class_id == "552ede8f-6b54-426d-8d29-abdc43a668cb" ~ "C-14",
+                              class_id == "5bd961c4-659c-40a7-a685-6735189f2b65" ~ "C-15",
+                              class_id == "60e05fa5-c986-4973-9833-16238720b727" ~ "C-16",
+                              class_id == "65246c1e-a176-4760-acb5-a320a9b7b2fe" ~ "C-17",
+                              class_id == "686478e7-82ac-4e6c-a3ec-2da0076ef868" ~ "C-18",
+                              class_id == "79662249-02f6-48d8-aa99-1e1c0aeea77d" ~ "C-19",
+                              class_id == "7a987176-7e55-45b5-a715-7f56c59d5f49" ~ "C-20",
+                              class_id == "822d72d9-0c18-47a0-99fc-7223b4fd22f5" ~ "C-21",
+                              class_id == "8589cd83-192c-44c8-b649-cd848e519530" ~ "C-22",
+                              class_id == "94da41a4-f9f8-4225-bf41-42db737850b9" ~ "C-23",
+                              class_id == "97c61e74-5a20-4cf5-bf67-8f8db750d0e7" ~ "C-24",
+                              class_id == "98119d92-8cc6-416a-972c-630351726223" ~ "C-25",
+                              class_id == "9bdf8bfc-9998-4fd8-85d2-70c91cf94891" ~ "C-26",
+                              class_id == "9fad0c9e-9d3d-4eed-ada6-3959bd6d712c" ~ "C-27",
+                              class_id == "afcb6b4e-a0c0-46ce-b38c-c96329c91471" ~ "C-28",
+                              class_id == "b1421b49-4026-4c61-9786-d4ef110c8db3" ~ "C-29",
+                              class_id == "b16b895d-ca1d-4330-a36d-c43fb33436e5" ~ "C-30",
+                              class_id == "bc650f4f-11f0-439a-a90a-47726724c811" ~ "C-31",
+                              class_id == "bcae937d-c95f-436c-ac0f-d4a5e995de19" ~ "C-32",
+                              class_id == "c09145c1-d635-41ae-b881-17ab46895fe4" ~ "C-33",
+                              class_id == "c1168ee3-7ac8-4fdc-af0e-e375ad0629fe" ~ "C-34",
+                              class_id == "c7008a64-b43c-4eb4-bebf-07b08b9894ad" ~ "C-35",
+                              class_id == "cc1ffb2e-5555-4109-8ad8-2d49cb54ad10" ~ "C-36",
+                              class_id == "d0b4f5e2-6d8f-4828-91cd-3f4714b821b0" ~ "C-37",
+                              class_id == "fe8c4185-7e8d-48eb-bf0e-85562e060d5d" ~ "C-38"))
+
+eoc_temp <- eoc
+eoc_temp$chapter_number <-  as.factor(eoc_temp$chapter_number)
+
+#EOC with fill by chapter_number
+ggplot(eoc_temp, aes(y = EOC, fill = chapter_number)) +
+  theme_minimal() +
+  geom_boxplot(outliers = F) +
+  facet_wrap(~class_id)  +
+  scale_fill_manual(values = wes_palette(name = "Darjeeling1", n = 13, type = "continuous"))
+```
+
+```{r, warning=FALSE}
+#Boxplot of chapters by EOC
+ggplot(data = checkpoints_eoc, aes(x = as.factor(chapter_number), y = EOC)) +
+  geom_boxplot(outliers = FALSE, aes(color = as.factor(chapter_number)), show.legend = FALSE) +  
+  labs(title = "Boxplot of Chapters by EOC",
+       x = "Chapter Number") +
+  scale_color_manual(values = wes_palette("Darjeeling1", n = 16, type = "continuous")) +  
+  theme_minimal() +
+  geom_hline(yintercept = 0.6, linetype = "dashed", color = "black", size = 1.5) +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+From the visual analysis above, it does appear that EOC has a relationship with both Chapter Number and Class-ID, as the EOC does change significantly as the Chapter increases and the classes change.
+
+### Creating Response Variable
+
+Since we were able to find some correlations for the EOC variable, and the hackathon was a limited time event, we decided to pursue student performance as our main research/response variable. In order to simplify the analysis, we invesitaged with converting the continuous EOC variable into a binary variable for if the student was passing/failing the class.
+
+```{r, warning=FALSE}
+#Creating success variable by .6 > is pass and below is fail
+checkpoints_eoc$success <- ifelse(checkpoints_eoc$EOC > .6, "P", "F")
+
+#Histogram of EOC
+#install.packages("wesanderson")
+library(wesanderson)
+
+#colors for plot
+desired_color <- wes_palette("Darjeeling1")[1]  
+desired_color2 <- wes_palette("Darjeeling1")[5]  
+
+ggplot(data = checkpoints_eoc, aes(x = EOC, fill = success)) +
+  geom_histogram(color = "black", binwidth = 0.1, breaks = c(0, 0.05, 0.1, .15, 0.2, .25, 0.3, .35, 0.4, .45, 0.5, .55, 0.6, .65, 0.7, .75, 0.8, .85, 0.9, .95, 1)) +
+  labs(x = "EOC",
+       y = "Count",
+       title = "Histogram of EOC by Pass/Fail",
+       fill = "Pass/Fail") +
+  scale_fill_manual(values = c(desired_color, desired_color2)) +  
+  theme_minimal() +
+  theme(legend.position = "top", plot.title = element_text(hjust = 0.5)) 
+```
+
+We used a student grade of 0.6 (a D in the standard American letter grading system) as our cut off for a stugulling/failing student and an excelling one. Making the binary variable on this cusp turned out to be advantageous, as when our categories (F/P) are roughly 50/50 split - which is ideal for any categorical based model or algorithm.
+
+### Next Analysis Steps
+
+After determining a direction and response variable for our analysis, we created a single cleaning script to produce a clean data frame for any future modeling and analysis. With this clean data, we aimed to create an exploratory/predictive model that would identify the most important variables in if a student is failing or excelling in their CourseKata material.
+
+For more information on our next steps, see the Cleaning & Engineering, Modeling, and Final Findings sections.
+
+## Data Cleaning
+
+### Used Libraries
+
+To feature engineer and clean the given data, we utilized dplyr other tidyverse packages. Dplyr gave us a large range of data manipulation tools: table joining, filtering, mutating, selecting, etc.
+
+```{r}
+library(tidyverse)
+```
+
+### Used Data
+
+Based on our exploratory analysis, we are going to focus our attention on trying to find indicators for student performance. Because we found no correlation between student attitude and performance in our exploration, we will not include any data from the pulse table. This leaves us with only two tables to load, join, engineer, and clean.
+
+### CHECK_EOC Table
+
+The checkpoints_eoc table contains information about each students' performance on end of chapter exams. The EOC variable, which is the most important to our analysis, is a ratio of the number of correctly answered questions and the number of possibly asked questions.
+
+```{r}
+CHECK_EOC <- read.csv("data/checkpoints_eoc.csv") #loading data
+
+filtered_eoc <- CHECK_EOC %>%
+  mutate(avg_attempt = n_attempt/n_possible) %>% #creating metric to see how many attempts per possible question there are
+  filter(book == "College / Statistics and Data Science (ABC)", !is.na(EOC)) %>% #filtering by book with largest amount of data
+  select(-c(n_possible,n_correct,n_attempt,book)) 
+```
+
+**Things to note in the code above:**
+
+-   We created a new variable `avg_attempt` which is the ratio of attempted questions and total possible questions.
+
+-   We filtered the data set to only contain one of the three books. This was done to reduce cardinality within our final data set and confusion between conflicting chapter numbers. Additionally our exploratory analysis revealed no identifiable differences in the books. We selected the ABC book since it made up the largest proportion of observations (n = 9716).
+
+-   We removed the variables n_possible, n_correct, and n_attempt and book. The n\_... variables were removed because they were utilized in feature engineering and they were directly correlated to student EOC score, which predictive models would have identified.
+
+### PAGE_VIEW Table
+
+The page_views table contains information about students' use of individual text book pages such as time spent engaged on page, time spent idle, etc. Later, we will end up aggregating these values to be chapter sums for each student.
+
+```{r}
+#|output: false
+
+
+PAGE_VIEW <- read.csv("data/page_views.csv") #loading data
+
+filtered_views <- PAGE_VIEW %>% 
+  filter(book == "College / Statistics and Data Science (ABC)") %>%
+  mutate(idle = idle_brief + idle_long) %>% #combining both similar time columns
+  mutate(off_page = off_page_brief + off_page_long) %>% #combining both similar time columns
+  select(student_id, chapter_number, institution_id, release, engaged, idle, off_page, tried_again_clicks) %>%
+  group_by(student_id, institution_id, chapter_number, release) %>%
+  summarise(engaged_sum = sum(engaged, na.rm = T) / 60000, #convert to minutes from milliseconds
+            idle_sum = sum(idle, na.rm = T) / 60000, #convert to minutes from milliseconds
+            off_page_sum = as.numeric(format(sum(off_page, na.rm = T) / 60000, scientific = F)), #convert to minutes from milliseconds, also removed an issue with the variable being coded in scientific notation
+            tried_again_clicks_sum = sum(tried_again_clicks, na.rm = T))
+```
+
+**Things to note in the code above:**
+
+-   Similarly to the CHECK_EOC table, we filtered observations for only one book (look above for more details).
+
+-   We combined the `idle` variables into one singular, summed variable.
+
+-   We combined the `off_page` variable into a singular, summed variable.
+
+-   The table was grouped by student_id, institution_id, chapter_number, and the release version of the book. Essentially, each observation of the table is a student-chapter pair (each student appears in the table 12 times because there are 12 chapters in the book) and various metrics based on the student's performance for that individual chapter.
+
+-   Since we grouped the table, we also aggregated the idle, off_page, and tried_again_clicks to be sums. It is important to note that any time length/interval variable was converted from milliseconds to minutes.
+
+### Joining Tables
+
+```{r}
+#| output: false
+
+
+DATA <- left_join(filtered_eoc,filtered_views, by = c("student_id","chapter_number")) # final table
+```
+
+Both tables were joined together using `student_id` and `chapter_number` as the unique identifiers.
+
+### Data Cleaning on Final Table
+
+#### Making Understandable Institution and Class Names
+
+The given names for the institutions classes were uninterruptible, thus we assigned our own values to be the unique IDs of the institutions and classes. We utilized a similar naming convention for both variables: `I/C-#`.
+
+```{r}
+#renaming institutions and classes
+DATA <- DATA %>%
+  mutate(institution_id = case_when(institution_id == "04157183-8665-400a-925d-3bbb70ffe45e" ~ "I-01",
+                                    institution_id == "292cff87-3c74-4e94-8622-233afb0427dd" ~ "I-02",
+                                    institution_id == "364da48a-e0b2-4507-bc31-e7761fe16e95" ~ "I-03",
+                                    institution_id == "94a809a9-a0ef-4c47-8d96-3a5ad76f674b" ~ "I-04",
+                                    institution_id == "97aebe75-a051-4bff-a2c0-1d53eb5d9498" ~ "I-05",
+                                    institution_id == "d2e6c885-36f4-48b9-988b-42eef1f8ed9d" ~ "I-06",
+                                    institution_id == "f17495c5-e105-492d-878a-07a03ea3f805" ~ "I-07",
+                                    institution_id == "fc5f1b1b-2aeb-4e09-93fc-06fdac0d8030" ~ "I-08")) %>%
+  mutate(class_id = case_when(class_id == "0089dedf-6316-4c32-a38c-d48dfafed882" ~ "C-01",
+                              class_id == "074123e7-cd90-4500-86fe-286aaa733bf5" ~ "C-02",
+                              class_id == "0d546479-6f77-4477-9c7e-365cd36c97eb" ~ "C-03",
+                              class_id == "1020418a-3eeb-4251-88f7-150c8fe00a56" ~ "C-04",
+                              class_id == "103f5ce8-9e95-4916-815e-9f821d274a59" ~ "C-05",
+                              class_id == "1cca9f91-5c4a-4e1a-8e0e-293b070dfd6f" ~ "C-06",
+                              class_id == "20bd524c-bb2d-4b74-a419-929475b91d94" ~ "C-07",
+                              class_id == "2294d558-6f5d-41c5-8d28-7b5280970f95" ~ "C-08",
+                              class_id == "3631cec9-51d3-4237-906f-a142a715be51" ~ "C-09",
+                              class_id == "40e49bfa-f6cb-42fa-a3a4-b23592b799ec" ~ "C-10",
+                              class_id == "4a3b5b2c-ef0f-4121-96f4-fd8a42764836" ~ "C-11",
+                              class_id == "51711479-441b-4c02-aef7-517aca63a53f" ~ "C-12",
+                              class_id == "52619962-72f6-4716-9c64-1c06fe10f739" ~ "C-13",
+                              class_id == "552ede8f-6b54-426d-8d29-abdc43a668cb" ~ "C-14",
+                              class_id == "5bd961c4-659c-40a7-a685-6735189f2b65" ~ "C-15",
+                              class_id == "60e05fa5-c986-4973-9833-16238720b727" ~ "C-16",
+                              class_id == "65246c1e-a176-4760-acb5-a320a9b7b2fe" ~ "C-17",
+                              class_id == "686478e7-82ac-4e6c-a3ec-2da0076ef868" ~ "C-18",
+                              class_id == "79662249-02f6-48d8-aa99-1e1c0aeea77d" ~ "C-19",
+                              class_id == "7a987176-7e55-45b5-a715-7f56c59d5f49" ~ "C-20",
+                              class_id == "822d72d9-0c18-47a0-99fc-7223b4fd22f5" ~ "C-21",
+                              class_id == "8589cd83-192c-44c8-b649-cd848e519530" ~ "C-22",
+                              class_id == "94da41a4-f9f8-4225-bf41-42db737850b9" ~ "C-23",
+                              class_id == "97c61e74-5a20-4cf5-bf67-8f8db750d0e7" ~ "C-24",
+                              class_id == "98119d92-8cc6-416a-972c-630351726223" ~ "C-25",
+                              class_id == "9bdf8bfc-9998-4fd8-85d2-70c91cf94891" ~ "C-26",
+                              class_id == "9fad0c9e-9d3d-4eed-ada6-3959bd6d712c" ~ "C-27",
+                              class_id == "afcb6b4e-a0c0-46ce-b38c-c96329c91471" ~ "C-28",
+                              class_id == "b1421b49-4026-4c61-9786-d4ef110c8db3" ~ "C-29",
+                              class_id == "b16b895d-ca1d-4330-a36d-c43fb33436e5" ~ "C-30",
+                              class_id == "bc650f4f-11f0-439a-a90a-47726724c811" ~ "C-31",
+                              class_id == "bcae937d-c95f-436c-ac0f-d4a5e995de19" ~ "C-32",
+                              class_id == "c09145c1-d635-41ae-b881-17ab46895fe4" ~ "C-33",
+                              class_id == "c1168ee3-7ac8-4fdc-af0e-e375ad0629fe" ~ "C-34",
+                              class_id == "c7008a64-b43c-4eb4-bebf-07b08b9894ad" ~ "C-35",
+                              class_id == "cc1ffb2e-5555-4109-8ad8-2d49cb54ad10" ~ "C-36",
+                              class_id == "d0b4f5e2-6d8f-4828-91cd-3f4714b821b0" ~ "C-37",
+                              class_id == "fe8c4185-7e8d-48eb-bf0e-85562e060d5d" ~ "C-38"))
+```
+
+#### Making Categorical EOC Variable
+
+We created a new variable `grade` from the continuous EOC variable based on the standard American letter grading system. This variable ended up not be used in later analysis.
+
+```{r}
+# making cat. grade var.
+DATA$grade <- ifelse(DATA$EOC > .90, "A",
+                   ifelse(DATA$EOC >= .80, "B",
+                          ifelse(DATA$EOC >= .70, "C",
+                                 ifelse(DATA$EOC >= .60, "D", "F")
+                                        )))
+```
+
+#### Making Binary Categorical EOC Variable
+
+The main variable for our analysis was a binary categorical EOC variable called `success`. This variable indicated if a student was being "successful" or not in the class. We utilized a cut of of 0.6/60% as our cutoff because (1) it indicates a failing grade in the standard American letter grading system and (2) it proportioned our responses into roughly equal categories which was important for modeling and further analysis.
+
+```{r}
+# making bin. grade var for model
+DATA$success <- ifelse(DATA$EOC > .6, "P", "F")
+```
+
+##### Graph of Binary Categorical Response Variable
+
+```{r}
+#colors for graph
+library(wesanderson)
+desired_color <- wes_palette("Darjeeling1")[1]  
+desired_color2 <- wes_palette("Darjeeling1")[5]  
+
+DATA %>%
+  ggplot(aes(x = EOC, fill = success)) +
+  geom_histogram(color = "black", binwidth = 0.1, breaks = c(0, 0.05, 0.1, .15, 0.2, .25, 0.3, .35, 0.4, .45, 0.5, .55, 0.6, .65, 0.7, .75, 0.8, .85, 0.9, .95, 1)) +
+  labs(x = "EOC",
+       y = "Count",
+       title = "Histogram of EOC by Pass/Fail",
+       fill = "Pass/Fail") +
+  scale_fill_manual(values = c(desired_color, desired_color2)) +  
+  theme_minimal() +
+  theme(legend.position = "top", plot.title = element_text(hjust = 0.5)) 
+```
+
+### Changing Variable Types
+
+This code chuck ensures that all of our variables are of the correct type within our R environment.
+
+```{r}
+DATA <- DATA %>% 
+  mutate_if(is.character, as.factor) %>%
+  mutate(chapter_number = as.factor(chapter_number))
+```
+
+### Saving Data
+
+Lastly, we saved our data as a `.Rdata` file because it preserves all characteristics of an R data frame (like variable types and categorical levels/labels) - unlike a .csv or .txt file.
+
+```{r}
+save(DATA, file = "data/data.Rdata")
+```
+
+## Modeling
+
+For our exploratory model, we will be creating an extreme gradient boosted classification tree utilizing the XGboost engine. In particular, we will be utilizing the model to predict if a student if succeeding (EOC \> 0.6) or failing in their CourseKata material. Due to time constraints in training time, we are less worried about model performance, and more interested in using the model to identify what variables are most important in student success.
+
+### Libraries
+
+We will be mainly utilizing the tidymodels package to train and test our model. Other packages such as caret, data.table, and kableExtra help aid us in model grading and outputting resulting tables nicely.
+
+```{r, results = 'hide', message = FALSE}
+#libs
+library(tidyverse)
+library(tidymodels)
+library(caret)
+library(pROC)
+library(data.table)
+library(kableExtra)
+library(wesanderson)
+library(vip)
+```
+
+```{r}
+#| echo: false
+
+
+#data
+load("data/data.Rdata")
+
+# final data cleaning
+DATA <- DATA %>%
+  select(-c(student_id, EOC, grade))
+```
+
+### Data Budgeting
+
+Using tidymodels's built in tools, we are going to budget our data by splitting our data set into training and testing sets (70%/30%) via stratifying by our response variable. Also note that we created cross-validated data folds of our training set (10 folds is the default parameter for the vfold_cv function) also stratified by our response variable. We will utilize these training folds later during model tuning to determine the best combination of parameters for our model.
+
+```{r}
+set.seed(123)
+DATA_SPLIT <- DATA %>%
+  initial_split(strata = success)
+
+DATA_TRAIN <- training(DATA_SPLIT)
+DATA_TEST <- testing(DATA_SPLIT)
+
+set.seed(234)
+DATA_folds <- vfold_cv(DATA_TRAIN, strata = success)
+DATA_folds
+```
+
+### Making Our "Recipe"
+
+The last bit of data preparation that needs to be done is to create a tidymodels recipe. This recipe will tell our model how it should read and use the data we feed it.
+
+```{r}
+DATA_rec <-
+  recipe(success ~ ., data = DATA_TRAIN) %>%
+  step_unknown(all_nominal_predictors()) %>%
+  step_dummy(all_nominal_predictors(), one_hot = TRUE)
+
+prep(DATA_rec) # checking prep
+```
+
+This recipe in particular tells our model...
+
+-   To predict the variable "success" utilizing all other variables in the training data set.
+
+-   To create an "unknown" level in any nominal/factor predictor to replace any missing values within the variable.
+
+-   To make dummy, "one hot," variables for each level of every nominal/factor predictor.
+
+    -   Note that this will drastically increase our data's cardinality, which is why we are utilizing an algorithmic engine like XGboost.
+
+### Model Specifications
+
+Before we begin tuning our model, we outline the model specifications to tidymodels.
+
+```{r}
+xgb_spec <-
+  boost_tree(
+    trees = tune(),
+    min_n = tune(),
+    mtry = tune(),
+    tree_depth = tune(),
+    learn_rate = tune(),
+    loss_reduction = tune()) %>%
+  set_engine("xgboost") %>%
+  set_mode("classification")
+```
+
+The chunk above specifics to tidymodels that we...
+
+-   are creating a gradient boosted classification tree using the XGboost engine.
+
+-   are wanting to tune every parameter in the model.
+
+    -   trees
+
+    -   min_n
+
+    -   mtry
+
+    -   tree_depth
+
+    -   learn_rate
+
+    -   loss_reduction
+
+### Model Workflow
+
+Lastly, we combine our data recipe and model specifications into a single tidymodels workflow.
+
+```{r}
+#workflow
+xgb_workfl <- workflow(DATA_rec, xgb_spec)
+```
+
+### Model Tuning & Racing
+
+To find the best tune we utilized a race (ANOVA) on model accuracy. Racing our models cut down on overall training and tuning time because, instead of allowing inaccurate models to continue training on folds, they were eliminated from the race. Thus, allowing more computational power be used on the models that were preforming accurately. Note that in order to speed up the race, we did utilize the `doParallel` library. This library allows for parallel sessions of R to run on a singular device at once, drastically increasing model tuning speed (we found this to be most efficient if R was the only thing open on one's device).
+
+```{r}
+library(finetune)
+doParallel::registerDoParallel()
+
+set.seed(345)
+xgb_rs <- tune_race_anova(
+  xgb_workfl,
+  resamples = DATA_folds,
+  grid = 20,
+  metrics = metric_set(accuracy),
+  control = control_race(verbose_elim = TRUE)
+)
+```
+
+Due to time constraints of the project, we only utilized a training grid size of 20. A larger grid size could have yielded better models, but since we were able to find a satisfactory model within a grid of 20, we decided to not increase the number of models.
+
+### Race Results
+
+```{r}
+race <- plot_race(xgb_rs) 
+
+race +
+  labs(title = "Model Race (ANOVA)",
+        y = "Model Accuracy") +
+  theme_minimal() +
+  theme(plot.title = (element_text(hjust = 0.5)))
+```
+
+Based on the outcome of our race, 5 of the 20 models completed all 10 folds with a comparable and acceptable accuracy.
+
+```{r}
+#| warning: false
+
+
+show_best(xgb_rs) %>% 
+  kable(caption = "Best Models") %>%
+  kable_styling()
+```
+
+Of the five models that finished, the best had a mean accuracy of 0.76. Next we will train the highest preforming model on the entire training data set. The model's accuracy may increase/decrease when the model is trained on the entire, unfolded, training data.
+
+### Training Final/Best Model
+
+Based on our race, the best model (model 12) had the following parameters:
+
+-   mtry = 40
+
+-   trees = 1649
+
+-   min_n = 17
+
+-   tree_depth = 14
+
+-   learn_rate = 0.0054080
+
+-   loss_reduction = 0.0019212
+
+Instead of entering these values by hand, we will utilize tidymodels to simply extract the best model and retrain it using our entire training data set.
+
+```{r}
+xgb_last <- xgb_workfl %>%
+  finalize_workflow(select_best(xgb_rs, metric = "accuracy")) %>%
+  last_fit(DATA_SPLIT)
+```
+
+### Grading Final Model
+
+```{r}
+xgb_last$.metrics[[1]] %>%
+  kable(caption = "Best Model Metrics") %>%
+  kable_styling()
+```
+
+Based on our final training, our best model was able to obtain an 0.786 accuracy and an roc_auc of 0.8473478.
+
+```{r, warning = FALSE}
+ ROC_graph <- xgb_last %>%
+  collect_predictions() %>%
+  roc_curve(success, .pred_F) %>%
+  ggplot(aes(x = 1 - specificity, y = sensitivity)) +
+  geom_line(size = 1.5, color = "#5abcd6") +
+  geom_abline(
+    lty = 2, alpha = 0.5,
+    color = "gray50",
+    size = 1.2
+  ) +
+  labs(title = "ROC for Exploratory Model") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+ 
+ ROC_graph
+```
+
+Our model was able to produce an roc_auc of 0.8473478. This value is within the range of a good auc (0.8 - 0.9) which means that our model is a decent classifier for if a student is succeeding or failing in their CourseKata material.
+
+A confusion matrix for our model's predictions can reveal even more information about our model's performance.
+
+```{r}
+DATA_pred_val <- collect_predictions(xgb_last)$.pred_class
+
+model <- extract_workflow(xgb_last)
+
+DATA_act <- DATA_TEST$success
+
+cm <- confusionMatrix(DATA_pred_val, DATA_act)
+
+cm
+```
+
+Based on metrics derived from the confusion matrix, one can see that our model's specificity is at 82.05% while our sensitivity is at 73.97%. In other words, our model is better at predicting if a student is successful versus if a student is failing.
+
+### Identifying Key Features Within the Model
+
+Recall that the main purpose of our modeling efforts was to create an explortay model that allowed us to identify key variables and their effects on student success. Now that we have created a satisfactory model, we are able to see which variables are important in the model's classification methodology.
+
+Utilizing the `vip` library, we will extract the top 10 most important features from the model and identify which ones we want to commit further analysis on.
+
+```{r}
+importance_graph <- extract_workflow(xgb_last) %>%
+  extract_fit_parsnip() %>%
+  vip(geom = "col", num_features = 10, mapping = aes(fill = Variable))
+
+importance_graph +
+  labs(title = "Top Ten Important Variables for Pass/Fail") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5), legend.position = "none") +
+  scale_fill_manual(values = wes_palette(name = "Darjeeling1", n = 10, type = "continuous"))
+```
+
+Based on the importance graph, it appears that the categorical tree found `engaged_sum, avg_attempt, insitution_id_I.02` and`chapter_number_X1` to be the most important in determining if a student was passing or failing their CourseKata material.
+
+With our important variables identified, we will now commit our future analysis will be focused on how student engagement, average question attempt, institution, and chapter number affect student EOC scores and subsequently, if a student is passing/failing the CourseKata material.
+
+## Summarizing Findings & Conclusions
+
+### Libraries
+
+To analyze, graph, and understand our important variables, we will be utilizing the tools within the tidyverse package. Additionally, the colors for our graphs will be sourced from the *Darjeeling1* palette which can be found within the wesanderson palette package.
+
+```{r}
+library(tidyverse)
+library(wesanderson)
+
+desired_color <- wes_palette("Darjeeling1")[1]  # getting graph colors
+desired_color2 <- wes_palette("Darjeeling1")[5]  
+```
+
+```{r}
+#| echo: false
+
+
+#data
+load("data/data.Rdata")
+```
+
+### Analysis of Important Variables
+
+#### Student Determined Variables
+
+Two of the variables identified by our model were student determined/controlled variables. In other words, these variables are direct measurements of individual student behavior.
+
+##### Total Student Engagement
+
+Students' total time spent engaged with the CourseKata material seems to play a significant part in if they are successful academically. In particular, and unsurprising, it appears to be the case that students who spend more time engaged with CourseKata material are successful in the passing the material Thus, overall lack of engagement with the material should serve as a warning sign to instructors that a student may be failing or struggling in the CourseKata material.
+
+```{r}
+box_engaged_sum <- DATA %>%
+  ggplot(aes(x = success, y = engaged_sum)) +
+  labs(title = "Pass/Fail and Student Engagement",
+       x = "Pass/Fail",
+       y = "Total Engaged Minutes\n(log scale)") +
+  scale_y_continuous(trans = scales::pseudo_log_trans(base = 10)) +
+  geom_violin(aes(color = success)) +
+  geom_boxplot(width = 0.4, aes(fill = success), outliers = F) +
+  scale_fill_manual(values = c(desired_color, desired_color2)) +  
+  coord_flip() +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5), legend.position = "top")
+box_engaged_sum
+```
+
+Note that the horizontal axis utilizes logarithmic scaling.
+
+#### Average Question Attempt
+
+A student's average number of question attempts also appears to be related to their EOC and thus chances of passing/failing the CourseKata material. In particualr, there appears to be an identifiable cut off around where the average number of attempts is more than three (black line on graph) where there are significant more students who are failing than passing the material. Again, and perhaps a better indicator than total engagement time, average number of question attempts could serve as an indicator to instructors that a student may be struggling with the course material.
+
+```{r}
+avg_attempt_hist <- DATA %>%
+  ggplot(aes(x = (avg_attempt), y = EOC, color = fct_rev(success))) +
+  geom_jitter() +
+  scale_x_continuous(trans = scales::pseudo_log_trans(base = 10)) +
+  labs(title = "Average Number of Attempts per Question by EOC",
+       x = "Average Number of Attempts per Question\n(log scale)",
+       color = "Pass/Fail") +
+  geom_vline(xintercept = 3) +
+  scale_color_manual(values = c(desired_color2, desired_color)) +  
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5), legend.position = "top")
+avg_attempt_hist
+```
+
+Note that the horizontal axis utilizes logarithmic scaling.
+
+#### Environment Determined Variables
+
+Two of the variables identified by our model were environment determined/controlled variables. In other words, these variables are elements of the course that individual students have little to no control over (e.g. instructor/institution, book version, course material itself, etc).
+
+#### Institutions
+
+Our model identified that students at different institutions preformed significantly different in the CourseKata material. Specifically, a large majority of students from institutions 2, 7, and 8 passed the CourseKata material, and half or more of students from institutions 3, 4, 5, 6 did not pass. Institutions were kept anonymous in the data release used for this analysis, thus we have no insights to why these different institution preformed at such different levels. However, it is recommended that if the CourseKata material is to improve, internal teams should investigate the different well and poor preforming students at each institution and attempt to identify trends.
+
+```{r}
+StackbarsInst <- DATA %>%
+  ggplot(aes(x = institution_id, fill = fct_rev(success))) +
+  geom_bar(position = "fill",
+           colour = "black",
+           size = 0.35) +
+  coord_flip() +
+  labs(title = "Institutions and Pass/Fail Proportions",
+       x = "Institution",
+       y = "Proportion of Students",
+       fill = "Pass/Fail") + 
+  scale_fill_manual(values = c(desired_color2, desired_color)) +  
+  geom_hline(yintercept = 0.5, linetype="dotted", size = 1) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5), legend.position = "top")
+StackbarsInst
+```
+
+#### Book Chapter
+
+Book chapter also played a significant impact on student performance. In particular, it appears that as the material advances, student performance degrades. Specifically, there is the greatest amount of degradation in chapters 10-13 were the majority of students go from passing to failing the material. Further investigation needs to be done into why this academic attrition occurs, and how to prevent it in future course editions and volumes.
+
+```{r}
+StackbarsCh <- DATA %>%
+  ggplot(aes(x = chapter_number, fill = fct_rev(success))) +
+  geom_bar(position = "fill",
+           colour = "black",
+           size = 0.35) +
+  coord_flip() +
+  labs(title = "Book Chapter and Pass/Fail Proportions",
+       x = "Book Chapter",
+       y = "Proportion of Students",
+       fill = "Pass/Fail") + 
+  scale_fill_manual(values = c(desired_color2, desired_color)) +  
+  geom_hline(yintercept = 0.5, linetype="dotted", size = 1) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5), legend.position = "top")
+StackbarsCh
+```
+
+#### Book Version
+
+The gradient boosted classification tree did identify book version as a variable of importance. It appears that the book that students performance. does change from volume to volume. In particular, over half the students utilizing v5.0 and v5.1.1 are failing the material, and over 60% of the students utilizing v5.0-exp1 and v5.2 are passing the material. It should be noted that book version may be confound with other variables such as instructor, and institution. There was not enough data within the sample given to us to confirm or deny this, thus internal CourseKata teams should confirm/deny the effects of book version on student performance.
+
+```{r}
+StackbarsVer <- DATA %>%
+  ggplot(aes(x = release, fill = fct_rev(success))) +
+  geom_bar(position = "fill",
+           colour = "black",
+           size = 0.35) +
+  coord_flip() +
+  labs(title = "Book Version and Pass/Fail Proportions",
+       x = "Book Version",
+       y = "Proportion of Students",
+       fill = "Pass/Fail") + 
+  scale_fill_manual(values = c(desired_color2, desired_color)) +  
+  geom_hline(yintercept = 0.5, linetype="dotted", size = 1) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5), legend.position = "top")
+StackbarsVer
+```
+
+It should be noted that book version was less important within the model than the other variables investigated; however, our team still deemed that analysis of this variable may provided insights on how CourseKata could be improved.
+
+### Next Steps and Final Recommendations
+
+Our recommendations to the internal teams of CourseKata are...
+
+-   to remove or rework the subjective “pulse” questions, as they had no statistical relevance or significance.
+
+-   utilize total time engaged and average number of question attempts as early warning indicators for failing students. If instructors are given early warning of a student's performance, they may be able to better help and aid that student in their learning.
+
+-   to investigate the discrepancies among the general performance of student bodies at different institutions.
+
+-   confirm the effects of different textbook volumes/editions on student performance. We recommend checking for confounding effects/factors like institution, instructor, class grade level, etc.
+
+## Extra Content
+
+Unrelated to our main research goals, one member of our team tried to identify trends within students' written responses. This avenue of analysis was abandoned when our model was able to identify more succinct and significant findings (see Modeling for more info).
+
+With the time dedicated to the analysis of student written responses, our team member was able to do some text mining and create a word cloud of the most common words utilized in students' responses.
+
+### Text Mining and Word Cloud
+
+```{r, warning=FALSE}
+#| output: false
+
+
+#install.packages("wordcloud")
+library(wordcloud)
+
+#install.packages("RColorBrewer")
+library(RColorBrewer)
+
+#install.packages("wordcloud2")
+library(wordcloud2)
+
+#install.packages("tm")
+library(tm)
+library(tidyverse)
+responses <- read.csv("data/responses.csv")#View(responses_sample)
+
+pass_responses <- responses %>% 
+  mutate(points_possible = as.numeric(points_possible)) %>% 
+  mutate(points_earned = as.numeric(points_earned)) %>% 
+  filter(!is.na(points_earned)) %>% 
+  filter(!is.na(points_possible)) %>% 
+  mutate(perc_score = points_possible/points_earned) %>% 
+  filter(perc_score > .6) %>% 
+  filter(institution_id == "97aebe75-a051-4bff-a2c0-1d53eb5d9498")
+```
+
+```{r, warning=FALSE}
+# Making DF for word clouds
+
+# Pre word cloud
+corpus = Corpus(VectorSource(pass_responses$response))
+
+corpus <- corpus %>% 
+  tm_map(removeNumbers) %>%
+  tm_map(removePunctuation) %>%
+  tm_map(stripWhitespace) %>%
+  tm_map(content_transformer(tolower)) %>%
+  tm_map(removeWords, stopwords("english")) %>%
+  tm_map(removeWords, stopwords("SMART"))
+
+tdm = TermDocumentMatrix(corpus) %>% 
+  as.matrix()
+
+words = sort(rowSums(tdm), decreasing = TRUE)
+
+pre_WCdf = data.frame(words = names(words), freq = words)
+
+
+# Color Palettes
+pre_WCcolors = c("#510C76", "#00A8E2", "#87714D")
+pre_WCbkgd = "#FFFFFF"
+post_WCcolors = c("#FFFFFF", "#510C76", "#87714D")
+post_WCbkgd = "#00A8E2"
+
+#rm unneeded vars
+rm(corpus, tdm, words)
+
+WC_Pre <- wordcloud2(pre_WCdf,
+           color = rep_len(pre_WCcolors, nrow(pre_WCdf)),
+           backgroundColor = pre_WCbkgd,
+           fontFamily = "AppleMyungjo",
+           size = .62,
+           rotateRatio = 0)
+
+#Final wordcloud
+WC_Pre
+```

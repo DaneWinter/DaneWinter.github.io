@@ -2,9 +2,9 @@
   {
     "listing": "/portfolio/index.html",
     "items": [
-      "/portfolio/posts/post-with-code/index.html",
       "/portfolio/posts/Playfair/index.html",
-      "/portfolio/posts/welcome/index.html"
+      "/portfolio/posts/pysparkFeatureDrift/index.html",
+      "/portfolio/posts/datafest (2024)/index.html"
     ]
   }
 ]

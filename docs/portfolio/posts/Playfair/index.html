@@ -8,7 +8,7 @@
 
 <meta name="author" content="Dane Winterboer">
 <meta name="dcterms.date" content="2024-10-10">
-<meta name="description" content="A reconstruction and modernization of a 1801 William Playfair Graph">
+<meta name="description" content="A reconstruction and modernization of a 1801 William Playfair Graph.">
 
 <title>Dane Winterboer - Reconstruction of 19th Century Data Visualization</title>
 <style>
@@ -140,7 +140,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/" target="_blank"> <i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://github.com/DaneWinter" target="_blank"> <i class="bi bi-github" role="img">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -163,7 +163,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <h1 class="title">Reconstruction of 19th Century Data Visualization</h1>
                   <div>
         <div class="description">
-          A reconstruction and modernization of a 1801 William Playfair Graph
+          A reconstruction and modernization of a 1801 William Playfair Graph.
         </div>
       </div>
                           <div class="quarto-categories">
@@ -218,6 +218,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="data-preperation" class="level4">
 <h4 class="anchored" data-anchor-id="data-preperation">Data Preperation</h4>
 <div class="cell">
+<details class="code-fold">
+<summary>Show Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>DATA <span class="ot">&lt;-</span> DATA <span class="sc">%&gt;%</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Country =</span> <span class="fu">as.factor</span>(Country)) <span class="sc">%&gt;%</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">r =</span> <span class="fu">sqrt</span>(Area <span class="sc">/</span> <span class="fl">3.14</span>))</span>
@@ -259,11 +261,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">bold</span>(<span class="st">"Poland &amp; Treaty "</span>),</span>
 <span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>                              <span class="st">"of "</span>,</span>
 <span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">bold</span>(<span class="st">"Luneville."</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 </section>
 <section id="reconstruction" class="level4">
 <h4 class="anchored" data-anchor-id="reconstruction">Reconstruction</h4>
 <div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Show Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>DATA <span class="sc">%&gt;%</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>   <span class="fu">geom_circle</span>(<span class="fu">aes</span>(<span class="at">x0 =</span> center, <span class="at">y0 =</span> <span class="dv">0</span>, <span class="at">r =</span> scaledR, <span class="at">fill =</span> Faring), <span class="co"># circles</span></span>
@@ -319,6 +324,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">family =</span> <span class="st">"serif"</span>, <span class="at">color =</span> <span class="st">"black"</span>),</span>
 <span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>         <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"serif"</span>, <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
 <span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>         <span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -334,6 +340,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="data-preperation-1" class="level4">
 <h4 class="anchored" data-anchor-id="data-preperation-1">Data Preperation</h4>
 <div class="cell">
+<details class="code-fold">
+<summary>Show Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># data prep</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>DATA <span class="ot">&lt;-</span> DATA <span class="sc">%&gt;%</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dotLabels =</span> <span class="fu">paste</span>(Country, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>, Area, <span class="st">" Sq Mi"</span>))</span>
@@ -353,11 +361,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>                                   <span class="fu">bold</span>(<span class="st">"Poland &amp; Treaty "</span>),</span>
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">"of "</span>,</span>
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>                                   <span class="fu">bold</span>(<span class="st">"Luneville."</span>))))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 </section>
 <section id="new-graph" class="level4">
 <h4 class="anchored" data-anchor-id="new-graph">New Graph</h4>
 <div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Show Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>DATA <span class="sc">%&gt;%</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Population, <span class="at">y =</span> Taxation)) <span class="sc">+</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_circle</span>(<span class="fu">aes</span>(<span class="at">x0 =</span> Population, <span class="at">y0 =</span> Taxation, <span class="at">r =</span> scaledR<span class="sc">/</span><span class="dv">5</span>, <span class="at">fill =</span> Faring),</span>
@@ -381,6 +392,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>,</span>
 <span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">family =</span> <span class="st">"serif"</span>, <span class="at">color =</span> <span class="st">"black"</span>),</span>
 <span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"serif"</span>, <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">face =</span> <span class="st">"bold"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">

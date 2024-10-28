@@ -1,0 +1,37 @@
+---
+title: "Pyspark (Databricks) Library for Feature Drift Detection"
+author: "Dane Winterboer"
+date: "2024-8-10"
+categories: [Python, Pyspark, Machine Learning, Feature Drift Detection]
+image: "thumbnail.png"
+description: "A library of Pyspark functions that preform feature drift detection, grouped EDA, and other useful tasks in Databricks."
+code-fold: true
+code-summary: "Show Code"
+toc: true
+toc-depth: 3
+---
+
+## Introduction
+
+To maintain optimal performance, machine learning models have to be refreshed. This is especially pertinent if a model's performance directly effects customers or business operations, as poor performance can have immediate negative consequences.
+
+Refreshing models takes time and computing resources, so although it is necessary, it can be costly. Thus, most companies implement strategies that establish when they choose to refresh models. Strategies such as...
+
+1.  **Regularly Scheduled Refreshes:** Refreshing models regularly is great because it is easy and consistent. However, its downside can lie in the time period an organization chooses. If the time period is too large, then real world trends may change during the periods between model refreshes. Vise versa, if the time window is too small, then one is refreshing models when they don't need to be and overusing commuting resources. This strategy effectively requires a "Goldilocks" period that is neither too large or short, which can be difficult to find.
+2.  **Refreshing when Model Preform Declines:** Refreshing models when their performance begins to decline is a fine strategy, unless the model's performance is crucial to maintaining the business. Depending on the use case, even slight degradation in performance can have dramatic outcomes. Additionally, model refreshes can sometimes take longer than anticipated, which could result in degrading models being in production for longer than one wants.  
+3.  **Refreshing when Trends Change:** A more proactive strategy would be to update models when the trends within data drifts. Large shifts in the trends of features a model uses can signify when a model needs to be refreshed. Thus, implementing trackers and reports that indicate substantial feature drift can lead to refreshing a model before performance is impacted. However, this strategy is difficult to generalize. Data across all use-cases looks different and requires alternative methods for feature drift detection.
+4.  **A Mix of Strategies:** It should be noted that the world of data is not as black and white as the options listed above, and most companies implement multiple systems and trackers for model refreshes. For example, it may be the case that a company has a policy to refresh models quarterly, but has trackers in place to send alerts when model performance declines or trends change - indicating the necessity to refresh outside of the regular schedule.
+
+This library of functions attempts to address the third strategy listed.
+
+As mentioned, identifying feature drift is a great method for indicating when a model needs to be refreshed; however, identifying feature drift is difficult to generalize across all use-cases. Thus, this library provides functions and tools that can be used to achieve a generalized feature drift detection methodology. It does this by leveraging Pyspark to distribute and parallelize the computation of robust, non-parametetric statistics that identify and measure feature drift regardless of data shape or size.  
+
+To view code for the library one can visit my github page of the library [here](https://github.com/DaneWinter/PysparkDQAandEDA/tree/main){.external target="_blank"}.
+
+## Library
+
+Bellow is an in-depth description of 
+
+### testNumeric
+
+### test

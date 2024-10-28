@@ -21,7 +21,7 @@ website:
       - text: "About"
         file: index.qmd
       - icon: github
-        href: https://github.com/
+        href: https://github.com/DaneWinter
         target: _blank
       - icon: linkedin
         href: https://www.linkedin.com/in/dane-winterboer-965554259

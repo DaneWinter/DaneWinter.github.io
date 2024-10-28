@@ -5,6 +5,8 @@ date: "2024-10-10"
 categories: [R, ggplot, Data Visualization]
 image: "thumbnail.png"
 description: "A reconstruction and modernization of a 1801 William Playfair Graph."
+code-fold: true
+code-summary: "Show Code"
 ---
 
 ```{r}
@@ -19,6 +21,7 @@ library(ggrepel)
 
 ```{r}
 #| include: false
+
 DATA <- read.csv("data/playfair_european_nations.csv")
 ```
 
