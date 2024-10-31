@@ -7,6 +7,8 @@ image: "thumbnail.png"
 description: "A reconstruction and modernization of a 1801 William Playfair Graph."
 code-fold: true
 code-summary: "Show Code"
+toc: true
+toc-depth: 3
 ---
 
 ```{r}
@@ -25,19 +27,42 @@ library(ggrepel)
 DATA <- read.csv("data/playfair_european_nations.csv")
 ```
 
-## Critique
+## Introduction
+
+Recently in one of my data visualization classes, we were tasked with recreating a 19th century William Playfair Graph using modern day visualization software.
+
+William Playfair is credited as being one of the founders of the use of graphical methods in statistics. In his "Chart Representing the Extent, Population and Revenues of the Principal Nations in Europe," Playfair attempted  to visualize comparative taxation among the European nations, specifically trying to rely the story that England taxed more heavily than other European nations. Playfair even writes in supporting text that the graph “shows whether in proportion to its population the country is burdened with heavy taxes or otherwise.”
+
+![Playfair's Orginal Visualization](thumbnail.png)
 
 Playfair's visualization effectively leverages the use of vertical lines to demonstrate discrepancies in population and taxation. The lines used in his graphic are akin to modern day use of bars in bar plots, in the manner that the vertical height/final resting place of the line/bar designates the value of the mapped metric. Since both population and taxation are mapped to similarly scales, his visualization essentially takes advantage of a dual y-axis, allowing for the viewer to directly and easily compare a county's population to its taxation. Additionally, a viewers perception is explicitly drawn towards any contrasts in tax and population via the dashed segment that connects a country's measures. This connecting segment not only draws perception, but also helps viewers distinguish between countries via the creation of perceptual groupings.
 
 Although not aiding in Playfair's goal of demonstrating unfair taxation, his use of circles to represent a country's square area is effective. The area of the circles appear to be properly mapped to a country's square area, and not mapped to the radius of the circles. Furthermore, the circles are plotted horizontally in descending order, establishing a clear hierarchy. However, the circles do distract from Playfair's primary thesis. The size, coloring, and "weight" of the circles draws immediate attention towards the bottom of the graph - which is away from the lines/measures of population and taxation. Without knowing Playfair's intentions, one may assume that he is attempting to assert an argument not about the relation of population and taxation, but rather the relationship between a country's area and population, or a country's area and taxation, and/or any combination of the three.
 
-Playfair's use of the color in the graphic is ineffective and confusing. Particularity because he is using multiple color systems at one time. The vertical population and taxation lines have red and yellow highlights (respectively), some of the circles are colored via if their respective country has a land or sea faring economy, some of the circles are colored internally for their land mass location (Europe, Asia, Africa), and the German Empire's circle is colored in its own system which correlates with a Venn diagram bellow the circle. Not only are there multiple color systems, but they all share the same colors - red, green, and yellow (this may have been due to a restriction of technology at the time of this visualization's creation). Color creates implied groups and correlations within visualizations. Thus, when one first perceives the visualization, there are implicit connections: all of the red, yellow, and green elements must be alike. Reading Playfair's writings on the graph dispels these connections; however, visualizations should not have to rely on lengthy writings. It also may have been prudent to include a key for color somewhere on the graph. Overall, Playfair tried to achieve too much with the "color element" of his graphic, resulting in confusing perceptional groupings.
-
-Despite the critiques on Playfair's visualization, it does effectively demonstrate his thesis that Britain and Ireland (England) appear to be more heavily taxed as their taxation to population ration is substantially larger than the other counties shown.
-
 ## Re-creation
 
-#### Data Preperation
+In attempt to recreate the visualization using modern day software, I utilized R an the ggplot, ggthemes, and ggforce libraries. Ggplot does most of the heavy lifting for the visualization; however, ggthemes allows me to more closely match the original stylization of Playfair's chart, and ggforce has a circle geom for ggplot. It may be possible to recreate the chart without the use of ggforce's geom_circle, but it makes the task much simpler. 
+
+### Data Preparation
+
+The first, and most important step in the recreation process was preparing the data. For the assignment, I was given a simple tidy dataframe that contained four columns of information:
+
+1.    Country Name
+2.    Country Area
+3.    Country Population
+4.    Country Taxation
+
+In order to properly map the elements of the graph I had to engineer:
+
+1.    Country Circle Radius
+2.    Scaled Country Circle Radius
+3.    Country Circle Center
+4.    Country Circle Labels
+5.    Label Adjustment/Padding
+6.    Country Faring Type (land/sea)
+7.    Plot Title with Proper Formatting
+
+#### Data Preperation Code
 
 ```{r}
 DATA <- DATA %>%
@@ -83,7 +108,16 @@ plotTitle <- expression(paste(italic("Chart"),
                               bold("Luneville.")))
 ```
 
-#### Reconstruction
+### Graphing
+
+After feature engineering and data preparation was complete, it became a manner of mapping the correct data frame features to the correct graphical elements and layers. I spent significant time on the stylizing elements of the graph so that it would closely match Playfair's original style. I made sure to include:
+
+-   Serif Fonts
+-   Dual, Repeated y-axis labels
+-   Color matching (the best I could) to the faded colors of the orignal
+-   Axis and element labels
+ 
+#### Graphing Code & Final Reconstruction
 
 ```{r}
 #| fig-asp: 0.5
@@ -150,6 +184,12 @@ DATA %>%
 
 ## New Data Visulization
 
+After reconstructing Playfair's chart, I spent some time recreating it using modern day visualization methods and techniques.
+
+Playfair's main thesis was to show that England had unfair taxation for its population. Therefore the primary elements of the visualization should attempt to reflect this relationship. Thus, I choose the x and y axis to represent population and taxation (respectively). This allows a viewer to directly see and contrast the population and taxation values of the countries shown, and identify outliers. Immediately, one is able to see that this visualization does support Playfair's original thesis, as Britain and Ireland (England) break pattern and show a substantially greater taxation for their population.
+
+I attempted to preserve all other original elements of Playfair's graphic: circle area for country area, labels for countries and square miles, colors for if a country's economy is land or sea faring, title, font type/face, and a yellowed background. I preserved all of these elements because it was my goal to demonstrate that changing/remapping even just one or two elements can make a significantly more concise visualization.
+
 #### Data Preperation
 
 ```{r}
@@ -174,7 +214,7 @@ plotTitle <- expression(atop(paste(italic("Chart"),
                                    bold("Luneville."))))
 ```
 
-#### New Graph
+#### Code for Graphic & New Graph
 
 ```{r}
 #| fig-asp: 0.5
@@ -207,10 +247,7 @@ DATA %>%
         text = element_text(family = "serif", color = "black", face = "bold"))
 ```
 
-## Concluding Explanation
+If I were to improve the visualization further I would change the font type/face. Serif fonts, especially in small sizes like shown in both the original and new graphic, are difficult to read. A sans serif font would be much easier for viewers to read. I would also remove the yellowed background as it holds no true purpose to the thesis, and I would change the title to be more concise. Lastly, I would take effort in drawing a viewers perception to Britain and Ireland's circle. Since the main thesis is to highlight it's peculiarity, I would leverage something to draw viewers' eyes towards the point (enclosing the circle in a red border or pointing a red arrow towards it are two ideas).
 
-Playfair's main thesis is to show that England has unfair taxation for its population. Therefore the primary elements of the visualization should attempt to reflect this relationship. Thus, I choose the x and y axis to represent population and taxation (respectively). This allows a viewer to directly see and contrast the population and taxation values of the countries shown, and identify outliers. Immediately, one is able to see that this visualization does support Playfair's original thesis, as Britain and Ireland (England) break pattern and show a substantially greater taxation for their population. Formatting the primary variables in this way creates a less cluttered visualization as it removes two mapping elements from the original graph, and better utilizes the graphic's white space.
 
-I attempted to preserve all other original elements of Playfair's graphic: circle area for country area, labels for countries and square miles, colors for if a country's economy is land or sea faring, title, font type/face, and a yellowed background. I preserved all of these elements because it was my goal to demonstrate that changing/remapping even just one or two elements can make a significantly more concise visualization.
 
-If I were to improve the visualization further I would change the font type/face. Serif fonts, especially in small sizes like shown in both the original and new graphic, are difficult to read. A sans serif font would be much easier to read. I would remove the yellowed background as it holds no true purpose to the thesis, and I would change the title to be more concise. Lastly, I would take effort in drawing a viewers perception to Britain and Ireland's circle. Since the main thesis is to highlight it's peculiarity, I would leverage some gestalt principle of perception to draw viewers' eyes. Specifically, I would enclose the circle in a red border or point a red arrow towards it.

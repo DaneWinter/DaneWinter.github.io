@@ -30,8 +30,117 @@ To view code for the library one can visit my github page of the library [here](
 
 ## Library
 
-Bellow is an in-depth description of 
+What follows in an overview of each of the functions inside of the library. These descriptions outline the math, statistics, and high-level programming concepts utilized in each function. To actually read the code and see how these concepts were carried out in code, one can visit the github page for this library [here](https://github.com/DaneWinter/PysparkDQAandEDA/tree/main){.external target="_blank"}.
 
 ### testNumeric
 
-### test
+The testNumeric function tests numeric features for changes/drift in shape and central tendency. It does this through a staged analysis process that weeds features as it progresses, preventing further analysis on features that are found to have not drifted from the benchmark.
+
+The first stage of analysis is conducting a two-sample Kolmogorov–Smirnov test at a user defined significance level. The Kolmogorov–Smirnov test is a non-parametric statistical test that tests whether two features came from the same probability distribution. If a feature passes the test (rejecting the null hypothesis, i.e. the feature’s distribution is different from the benchmark distribution), then it passes onto the next stage of analysis. If a feature fails to pass the test (failing to reject the null hypothesis, i.e. the feature’s distribution is identical to the benchmark distribution) then analysis on that feature is halted. The function also allows for the use of significance adjustment. If specified in the parameterization, the function will apply a Bonferroni significance adjustment on the p-values of the Kolmogorov–Smirnov test, where **n** is the number of numeric features being tested by the function. It should be noted that the Kolmogorov–Smirnov test is computationally robust, as one is able to leverage Spark Clusters to compute and compare cumulative density functions distributedly. This significantly reduces the time it would take for a single machine to calculate the test statistic and p-value derived from a Kolmogorov–Smirnov test.
+
+Due to the large nature of transaction datasets, the Kolmogorov–Smirnov test has a tendency to identify small changes in features that would typically be considered nonsubstantive. Consequently, it is necessary to analyze the effect size of differences detected by the Kolmogorov–Smirnov test. Robust, standard central differences are calculated for every feature that passes a Kolmogorov–Smirnov test, to quantify effect size in central tendency changes. The standard central differences calculated are modeled after Cohen’s d (standard mean difference), but utilize Harrell-Davis quantiles to compute median difference and a pooled, absolute median dispersion instead of a mean and pooled standard deviation ([Akinshin](https://aakinshin.net/posts/nonparametric-effect-size/){.external target="_blank"}).
+
+$$
+d = {{\bar{Y} - \bar{X} } \over {s}} \approx {{Q_{0.5}(Y) - Q_{0.5}(X)} \over {PMAD_{XY}}} = \gamma_{0.5}
+$$
+This allows us to have an effect size measure that is resilient to feature shape and outliers. The effect size measures are compared to a user defined substantivity cutoff (function utilizes a 0.1 default, but recommends users to adjust for use case). If the effect size change for a feature exceeds the cutoff, the difference is labeled as substantive. Otherwise, differences are labeled as insubstantial.
+
+The final stage’s optionality is defined by the user, and based on the outcomes of the Kolmogorov–Smirnov test and effect size measure. During parameterization, the user is able to specify a list of “significance and substantiveness codes” for features that they want the final stage of analysis to be performed on. The codes are pairs of plus or minus signs divisioned by a forward slash (+/+,  +/-,  -/-). The first element in the pair denotes the result of the Kolmogorov–Smirnov test (+ for pass, - for fail), and the second for if the change detected was substantive (+ for substantive, - for insubstantial). The user can select multiple or all codes to analyze multiple/all categories of features. To skip the final stage altogether, the user can pass an empty list to the function and no features will go through the final stage.   
+
+`Note that the combination “-/+” is impossible as when a feature fails the Kolmogorov–Smirnov test, the effect size measure is automatically set to zero.`
+
+The final stage of analysis creates confidence intervals for the differences in mean, standard deviation, median, interquartile range, kurtosis and skewness of a feature based on bootstrapped sampling distributions from both the training and benchmark datasets. Bootstrapping is a very powerful and robust statistical method due to its nonparametric nature; however, it is extremely computationally expensive and time consuming. Testing estimated that bootstrapping for a single statistic while using native, spark-based distributed sampling and aggregation functions, would take over twenty-four hours for all features in a training and benchmark dataset (both around two million observations). Therefore, alternative computation strategies were tested. Parallelization of computation resulted in the best results, allowing for all statistics to be bootstrapped for features of significant feature drift, within one hour of run time.
+
+This efficiency of computation was achieved through parallelizing a single spark-context to all workers within a spark cluster. Parallelizing a spark-context does require flat, non-distributed data, meaning that this methodology only works on reasonably large datasets. To save available memory on workers and increase computation speed, features are flattened and parallelized individually and sequentially. This allows features not in current use to be deallocated from memory. The function also leverages nested structs to compute and store multiple statistics from a single random sample into a distributed dataframe. Once all bootstrapped statistics are calculated, the nested structs are unnested and the bootstrapped sampling distributions (empirical samples) are created. Confidence intervals for each statistic are then derived from the differences of these distributions.
+
+`The cluster I tested the functions on had 26 workers, each with 16 cores and 128 gb of memory. The parameters for parallelizing bootstrapped samples should be adjusted via the function's parameters for different cluster configurations.`
+
+After analysis is finished, the function outputs a table of shape and center metrics of all numeric features tested, CDF and PDF graphs showing differences in features' distribution, visualized empirical samples derived from bootstrapping, and a table of statistics and confidence intervals from empirical samples.   
+
+### testProportions
+
+The testProportions function identifies drift in all categorical variables shared by the training and benchmark data sets. The function calculates an absolute proportional difference for the categories in each categorical variable, which is then compared to a user-defined ACPD (absolute categorical proportional difference) cutoff. If the value calculated for the feature exceeds the user defined cutoff, the feature is flagged and graphics of the proportional difference are created.
+
+The absolute proportional difference is calculated as...
+
+$$
+\sum_{i = 1}^{n}|Proportion\;of\;Category_{\:i,\:train} - Proportion\;of\;Category_{\:i,\:test}|
+$$
+
+where **n** is the total number of categories in a feature. It should be noted that this measure has a tendency to bloat when **n** is large. Thus, average ACPD, **n**, and largest categorical difference accompany ACPD in the function’s output. Comparing all metrics provides data scientists the opportunity to better understand nuances within categorical drift than if only ACPD was provided.
+
+The function is computationally robust as it derives the proportions of categories via counts calculated by Pyspark native distributed functions.  
+
+After analysis is finished, the function outputs a table of features' category counts, proportions, and differences, graphs of all numeric features' categories with the largest proportional differences, and a summary table of all features' proportional drift statistics. 
+
+### testNull
+
+The testNull function compares differences in features’ null rates. The function does this by calculating and comparing the proportions of null rates in features as shown below.    
+
+$$
+{Proportion \; of \; Null \; in \; F_{\;train} - Proportion \; of \; Null \; in \; F_{\;bench}} 
+\over
+{Proportion \; of \; Null \; in \; F_{\; bench} + 0.1}
+$$
+
+where **F** is the feature being tested.
+
+This statistic was designed to be more sensitive towards null rates that have a history of being close to zero. Consider that a feature with a benchmark proportional null rate of 0 and a training proportional null rate of 0.05 returns a value of 0.5, while a feature with a benchmark proportional null rate of 0.9 and a training proportional null rate of 0.95 returns a value of 0.056. This discrepancy in sensitivity was included into the function to direct the attention of users towards features that break historic trends - particularly trends that went from low rates of nulls to high rates of nulls. Features that produce a statistic above a user defined cutoff will be flagged and visualized graphically. There is no default cutoff; however, typically values of 0.1 or above are significant.  
+	
+The function is computationally robust as it derives the proportions of categories via counts calculated by Pyspark native distributed functions.
+
+The function outputs a summary table of null rate difference statistics for each feature tested, and bar charts of features with a substantial null rate difference. 
+
+### testMultivariateNumericOutlier
+
+The testMultivariateNumericOutlier function performs nonparametric outlier analysis to give an estimated number of anomalous data points within a dataset, based solely on the values of numeric features. To identify anomalous data points, the function trains and utilizes an isolation forest algorithm. Isolation forests are a tree based ensemble machine learning algorithm (much like a random forest) that provide a nonparametric approach to detecting outliers. The main difference between isolation forests and other ensemble tree algorithms, is that instead of formulating predictions, it generates anomaly scores for each data point. This score, **s(xi , N)**, for an individual point can be calculated as
+
+$$
+s(x_i, N) = 2^{{-E(h(x_i))} \over {c(N)}}
+$$
+
+where **E(h(xi ))** is the average path length for the instance (data point) **i** across all trees in the forest, and **c(N)** is the average depth in an unsuccessful search in a binary search tree ([S. Hariri](https://www.researchgate.net/publication/336950078_Extended_Isolation_Forest_with_Randomly_Oriented_Hyperplanes){.external target="_blank"}).
+
+$$
+c(N) = 2H(n-1) - ({{2(n-1)} \over {n}})
+$$
+
+where **n** is the number of data points used in tree construction and **H(x)** is the harmonic number estimated by...
+
+$$
+H(x) = ln(x) + \gamma,
+$$
+
+where  is Euler’s constant which can be substituted for an estimate of 0.5772156649. The anomaly score produced ranges from zero to one, with values closer to one being more anomalous. The isolation forest model uses an user defined value cut off, of which 0.5 was selected for this function.
+
+`i.e. any data point with a score greater than or equal ot 0.5 was labeled as an anomaly`
+
+Spark doesn’t have a native function for creating isolation forests. Therefore, the function utilizes Scikit-Learn to train and create the forest. This means that the forest has to be trained on a single node and be trained with flattened data. However, the function does distribute the “prediction” or assignment of anomaly scores. The function achieves distribution through a custom SQL user defined function that broadcasts a sklearn scaler and fit classifier. When the user defined function is called on a distributed data frame to create the scores, the scalar and classifier objects are copied and passed to each worker node within a cluster. This gives each worker node the capability to encode and calculate the anomaly score for any given data point. Since the calculations of scores are independent, each node is then able to calculate the scores for the data points within their own partition of the distributed data frame simultaneously to all the other nodes. For very large datasets, this distribution of calculation saves significant time on overall function run time. After anomaly scores are calculated, potential anomalous data points are counted by the function. The count of regular and anomalous data points are then outputted as a table for the user.
+
+Optionally, the function is also able to visualize multivariate outliers graphically. By performing principal component analysis on the features used to train the isolation forest, the function is able to calculate the first two principal components for every data point. Using these principal components as coordinates, the function graphs the points in a two-dimensional scatter plot where each data point is colored by its anomalous classification (normal/outlier). Graphing the data points allows data scientists to potentially identify clusters of anomalous data points. However, it should be noted that one should always consider the accounted variance of the principal components generated before accepting or rejecting the validity of the visualization. The data this function was tested on tended to preform well with principal component analysis, allowing for the first two principal components to regularly account for at least ninety-eight percent of explained variance.
+
+### Summarizizng by Group Functions (Grouped EDA)
+
+The two following functions are simple functions that can be used to summarize features in a Pyspark dataframe via a grouping variable. These functions are not necessarily for feature drift detection, but rather provide a quick an easy way to produce descriptive statistics and aggregates of features grouped by a specified variable. 
+
+Both functions achieve computational robustness by utilizing native Pyspark functions to calculate the grouped statistics and aggregates  
+
+#### summarizeCategoricalByGroup
+
+This function produces a table if counts and proportions of every category in a categorical feature by the grouping variable. If specified in parameterization, the function will also produce barcharts illustrating the proportion of the grouping levels in each category within a feature. 
+
+#### summarizeNumericByGroup
+
+This function produces a summary table of statistics for inputted numeric features, aggreated by a grouping variable. If specified in parameterization, the function will also produce boxplots illustrating the numeric distributions of the grouping levels within a numeric feature.
+
+### Databrick Based Functions
+
+These following function is useful for generating reports based if one with working within Databricks Notebooks and filesystem.
+
+#### logNotebook
+
+The logNotebook function allows a user to programmatically save Databrick notebook runs as rendered html documents to Databrick's file system. The function can also either archive a link to the rendered document via MLflow or return the link as a Python string for alternative storage method.
+
+This function is extremely useful for sharing and distributing the results of notebook runs to anyone with access to your organization's Databricks instance. It allows data scientists, analysts, or engineers who work within Databricks to quickly share reports and figures to individuals within or outside of their teams. All a user has to do is run the function, and then share the generated link. Additionally, since the generation is programmatic, it can be utilized to archive the results of scheduled notebook runs.
+
+The sharing of report links is also secure, as system administrators are able to restrict and control user access to Databrick's file system. Thus, if a link is leaked, individuals outside of the organization, or non-vetted users, are not able to download reports via the leaked generated link. 
