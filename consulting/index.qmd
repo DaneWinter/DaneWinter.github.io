@@ -1,0 +1,51 @@
+---
+title: "Consulting Projects"
+description: "This is a listing of various consulting projects that I have worked on. Unless listed, I am unable to share copies of work due to confidentiality with my clients. If you would like to know more about any of the projects, you can reach out to me via any of my contact methods, or with the client or supervisor contact listed."
+title-block-banner: true
+date: 2024-10
+published-title: Consulting Projects Last Updated
+toc: true
+toc-depth: 2
+---
+
+## The Effect of Aphasia-Specific Communication Training on Student Physicians’ Interactions with Standardized Patients Portraying Non-Fluent Aphasia
+
+### Description
+
+Provided expert statistical consulting and assistance to primary researchers. I aided researchers in statistical testing design and preformed the statistical analysis, testing, visualization, and content analysis for the study.
+
+Due the the nature of the study, I primarily utilized paired, non-parametric statistical testing on quantitative study elements, and preformed sentiment and text mining analysis for qualitative study elements. 
+
+#### Contacts
+
+**Clients:** Tucker Murry (tmm3867@truman.edu)
+
+**Consulting Supervisor:** Dr. Scott K. Alberts (salberts@truman.eu)
+
+## Survey of Undergradute Students and Analysis of Primary Deciding Factors for College Selection 
+
+### Description
+
+Designed and executed a mass survey for a undergraduate student body to ascertain the primary deciding factors for college selection. Utilized non-parametric statistics to identify trends and differences within the survey results, which were summarized and visualized in a formal report to client. 
+
+Presented main findings to client, leaders in the University, and invested stakeholders.
+
+#### Contacts
+
+**Clients:** Hayden Wilsy (hwilsey@truman.edu)
+
+**Consulting Supervisor:** Dr. Scott K. Alberts (salberts@truman.eu)
+
+## Updating Intake Methods for Undergraduate First Destination Data
+
+### Description
+
+Designed and prototyped survey to efficiently garner a graduating undergraduate's first destination after college. The survey was designed to improve upon a current existing data collection system by reducing time required to complete the survey, improving question clarity, and creating a better surveyee experience.The new survey drastically improved survey completion rate and validity of results.
+
+In addition to the survey, cleaning scripts and code for automated reports were also provided for the client.
+
+#### Contacts
+
+**Clients:** Dr. David Lusk (dllusk@truman.edu), Joel Brumfield (jbrumfield@truman.edu)
+
+**Consulting Supervisor:** Dr. Scott Thatcher (thatcher@truman.edu)

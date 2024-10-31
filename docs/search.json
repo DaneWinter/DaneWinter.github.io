@@ -98,6 +98,34 @@
     "text": "I am a current senior at Truman State University studying Statistics and Data Science. I have always had an affinity and deep curiosity for computers, data, and problem solving. I am currently pursing career opportunities in in data science, analytics, and engineering as I find the work exciting and rewarding."
   },
   {
+    "objectID": "consulting/index.html",
+    "href": "consulting/index.html",
+    "title": "Consulting Projects",
+    "section": "",
+    "text": "Provided expert statistical consulting and assistance to primary researchers. I aided researchers in statistical testing design and preformed the statistical analysis, testing, visualization, and content analysis for the study.\nDue the the nature of the study, I primarily utilized paired, non-parametric statistical testing on quantitative study elements, and preformed sentiment and text mining analysis for qualitative study elements.\n\n\nClients: Tucker Murry (tmm3867@truman.edu)\nConsulting Supervisor: Dr. Scott K. Alberts (salberts@truman.eu)"
+  },
+  {
+    "objectID": "consulting/index.html#the-effect-of-aphasia-specific-communication-training-on-student-physicians-interactions-with-standardized-patients-portraying-non-fluent-aphasia",
+    "href": "consulting/index.html#the-effect-of-aphasia-specific-communication-training-on-student-physicians-interactions-with-standardized-patients-portraying-non-fluent-aphasia",
+    "title": "Consulting Projects",
+    "section": "",
+    "text": "Provided expert statistical consulting and assistance to primary researchers. I aided researchers in statistical testing design and preformed the statistical analysis, testing, visualization, and content analysis for the study.\nDue the the nature of the study, I primarily utilized paired, non-parametric statistical testing on quantitative study elements, and preformed sentiment and text mining analysis for qualitative study elements.\n\n\nClients: Tucker Murry (tmm3867@truman.edu)\nConsulting Supervisor: Dr. Scott K. Alberts (salberts@truman.eu)"
+  },
+  {
+    "objectID": "consulting/index.html#survey-of-undergradute-students-and-analysis-of-primary-deciding-factors-for-college-selection",
+    "href": "consulting/index.html#survey-of-undergradute-students-and-analysis-of-primary-deciding-factors-for-college-selection",
+    "title": "Consulting Projects",
+    "section": "Survey of Undergradute Students and Analysis of Primary Deciding Factors for College Selection",
+    "text": "Survey of Undergradute Students and Analysis of Primary Deciding Factors for College Selection\n\nDescription\nDesigned and executed a mass survey for a undergraduate student body to ascertain the primary deciding factors for college selection. Utilized non-parametric statistics to identify trends and differences within the survey results, which were summarized and visualized in a formal report to client.\nPresented main findings to client, leaders in the University, and invested stakeholders.\n\nContacts\nClients: Hayden Wilsy (hwilsey@truman.edu)\nConsulting Supervisor: Dr. Scott K. Alberts (salberts@truman.eu)"
+  },
+  {
+    "objectID": "consulting/index.html#updating-intake-methods-for-undergraduate-first-destination-data",
+    "href": "consulting/index.html#updating-intake-methods-for-undergraduate-first-destination-data",
+    "title": "Consulting Projects",
+    "section": "Updating Intake Methods for Undergraduate First Destination Data",
+    "text": "Updating Intake Methods for Undergraduate First Destination Data\n\nDescription\nDesigned and prototyped survey to efficiently garner a graduating undergraduate’s first destination after college. The survey was designed to improve upon a current existing data collection system by reducing time required to complete the survey, improving question clarity, and creating a better surveyee experience.The new survey drastically improved survey completion rate and validity of results.\nIn addition to the survey, cleaning scripts and code for automated reports were also provided for the client.\n\nContacts\nClients: Dr. David Lusk (dllusk@truman.edu), Joel Brumfield (jbrumfield@truman.edu)\nConsulting Supervisor: Dr. Scott Thatcher (thatcher@truman.edu)"
+  },
+  {
     "objectID": "portfolio/posts/pysparkFeatureDrift/index.html",
     "href": "portfolio/posts/pysparkFeatureDrift/index.html",
     "title": "Pyspark (Databricks) Library for Feature Drift Detection",

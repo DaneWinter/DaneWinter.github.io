@@ -5,6 +5,7 @@ date: 2024-09
 published-title: Résumé last updated
 engine: knitr
 freeze: false
+title-block-banner: true
 cv:
   pdf: "Resume.pdf"
 ---
