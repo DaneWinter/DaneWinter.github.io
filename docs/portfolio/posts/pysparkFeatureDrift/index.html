@@ -2,15 +2,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.555">
+<meta name="generator" content="quarto-1.5.57">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Dane Winterboer">
 <meta name="dcterms.date" content="2024-08-10">
-<meta name="description" content="A library of Pyspark functions that preform feature drift detection, grouped EDA, and other useful tasks in Databricks.">
+<meta name="description" content="A library of Pyspark functions that performs feature drift detection, grouped EDA, and other useful tasks in Databricks.">
 
-<title>Dane Winterboer - Pyspark (Databricks) Library for Feature Drift Detection</title>
+<title>Pyspark (Databricks) Library for Feature Drift Detection – Dane Winterboer</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -70,7 +70,7 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <script type="text/javascript">
@@ -115,7 +115,7 @@ window.Quarto = {
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -150,7 +150,7 @@ window.Quarto = {
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
-          <div class="quarto-navbar-tools">
+            <div class="quarto-navbar-tools">
 </div>
       </div> <!-- /container-fluid -->
     </nav>
@@ -162,7 +162,7 @@ window.Quarto = {
       <h1 class="title">Pyspark (Databricks) Library for Feature Drift Detection</h1>
                   <div>
         <div class="description">
-          A library of Pyspark functions that preform feature drift detection, grouped EDA, and other useful tasks in Databricks.
+          A library of Pyspark functions that performs feature drift detection, grouped EDA, and other useful tasks in Databricks.
         </div>
       </div>
                           <div class="quarto-categories">
@@ -228,10 +228,10 @@ window.Quarto = {
 <p>To maintain optimal performance, machine learning models have to be refreshed. This is especially pertinent if a model’s performance directly effects customers or business operations, as poor performance can have immediate negative consequences.</p>
 <p>Refreshing models takes time and computing resources, so although it is necessary, it can be costly. Thus, most companies implement strategies that establish when they choose to refresh models. Strategies such as…</p>
 <ol type="1">
-<li><strong>Regularly Scheduled Refreshes:</strong> Refreshing models regularly is great because it is easy and consistent. However, its downside can lie in the time period an organization chooses. If the time period is too large, then real world trends may change during the periods between model refreshes. Vise versa, if the time window is too small, then one is refreshing models when they don’t need to be and overusing commuting resources. This strategy effectively requires a “Goldilocks” period that is neither too large or short, which can be difficult to find.</li>
-<li><strong>Refreshing when Model Preform Declines:</strong> Refreshing models when their performance begins to decline is a fine strategy, unless the model’s performance is crucial to maintaining the business. Depending on the use case, even slight degradation in performance can have dramatic outcomes. Additionally, model refreshes can sometimes take longer than anticipated, which could result in degrading models being in production for longer than one wants.<br>
+<li><strong>Regularly Scheduled Refreshes:</strong> Refreshing models regularly is great because it is easy and consistent. However, its downside can lie in the time period an organization chooses. If the time period is too large, then real world trends may change during the periods between model refreshes. Vise versa, if the time window is too small, then one is refreshing models when they don’t need to be and overusing computing resources. This strategy effectively requires a “Goldilocks” period that is neither too large or short, which can be difficult to find.</li>
+<li><strong>Refreshing when Model perform Declines:</strong> Refreshing models when their performance begins to decline is a fine strategy, unless the model’s performance is crucial to maintaining the business. Depending on the use case, even slight degradation in performance can have dramatic outcomes. Additionally, model refreshes can sometimes take longer than anticipated, which could result in degrading models being in production for longer than one wants.<br>
 </li>
-<li><strong>Refreshing when Trends Change:</strong> A more proactive strategy would be to update models when the trends within data drifts. Large shifts in the trends of features a model uses can signify when a model needs to be refreshed. Thus, implementing trackers and reports that indicate substantial feature drift can lead to refreshing a model before performance is impacted. However, this strategy is difficult to generalize. Data across all use-cases looks different and requires alternative methods for feature drift detection.</li>
+<li><strong>Refreshing when Trends Change:</strong> A more proactive strategy would be to update models when the trends within data drift. Large drifts in features a model uses can signify when a model needs to be refreshed. Thus, implementing trackers and reports that indicate substantial feature drift can lead to refreshing a model before performance is impacted. However, this strategy is difficult to generalize. Data across all use-cases looks different and requires alternative methods for feature drift detection.</li>
 <li><strong>A Mix of Strategies:</strong> It should be noted that the world of data is not as black and white as the options listed above, and most companies implement multiple systems and trackers for model refreshes. For example, it may be the case that a company has a policy to refresh models quarterly, but has trackers in place to send alerts when model performance declines or trends change - indicating the necessity to refresh outside of the regular schedule.</li>
 </ol>
 <p>This library of functions attempts to address the third strategy listed.</p>
@@ -240,12 +240,12 @@ window.Quarto = {
 </section>
 <section id="library" class="level2">
 <h2 class="anchored" data-anchor-id="library">Library</h2>
-<p>What follows in an overview of each of the functions inside of the library. These descriptions outline the math, statistics, and high-level programming concepts utilized in each function. To actually read the code and see how these concepts were carried out in code, one can visit the github page for this library <a href="https://github.com/DaneWinter/PysparkDQAandEDA/tree/main" class="external" target="_blank">here</a>.</p>
+<p>What follows in an overview of each of the functions inside of the library. These descriptions outline the math, statistics, and high-level programming concepts utilized in each function. To actually read the code and see how these functions were programed, one can visit the github page for this library <a href="https://github.com/DaneWinter/PysparkDQAandEDA/tree/main" class="external" target="_blank">here</a>.</p>
 <section id="testnumeric" class="level3">
 <h3 class="anchored" data-anchor-id="testnumeric">testNumeric</h3>
-<p>The testNumeric function tests numeric features for changes/drift in shape and central tendency. It does this through a staged analysis process that weeds features as it progresses, preventing further analysis on features that are found to have not drifted from the benchmark.</p>
-<p>The first stage of analysis is conducting a two-sample Kolmogorov–Smirnov test at a user defined significance level. The Kolmogorov–Smirnov test is a non-parametric statistical test that tests whether two features came from the same probability distribution. If a feature passes the test (rejecting the null hypothesis, i.e.&nbsp;the feature’s distribution is different from the benchmark distribution), then it passes onto the next stage of analysis. If a feature fails to pass the test (failing to reject the null hypothesis, i.e.&nbsp;the feature’s distribution is identical to the benchmark distribution) then analysis on that feature is halted. The function also allows for the use of significance adjustment. If specified in the parameterization, the function will apply a Bonferroni significance adjustment on the p-values of the Kolmogorov–Smirnov test, where <strong>n</strong> is the number of numeric features being tested by the function. It should be noted that the Kolmogorov–Smirnov test is computationally robust, as one is able to leverage Spark Clusters to compute and compare cumulative density functions distributedly. This significantly reduces the time it would take for a single machine to calculate the test statistic and p-value derived from a Kolmogorov–Smirnov test.</p>
-<p>Due to the large nature of transaction datasets, the Kolmogorov–Smirnov test has a tendency to identify small changes in features that would typically be considered nonsubstantive. Consequently, it is necessary to analyze the effect size of differences detected by the Kolmogorov–Smirnov test. Robust, standard central differences are calculated for every feature that passes a Kolmogorov–Smirnov test, to quantify effect size in central tendency changes. The standard central differences calculated are modeled after Cohen’s d (standard mean difference), but utilize Harrell-Davis quantiles to compute median difference and a pooled, absolute median dispersion instead of a mean and pooled standard deviation (<a href="https://aakinshin.net/posts/nonparametric-effect-size/" class="external" target="_blank">Akinshin</a>).</p>
+<p>The testNumeric function tests numeric features for drift in shape and central tendency. It does this through a staged analysis process that weeds features as it progresses, preventing further analysis on features that are found to have not drifted from the benchmark.</p>
+<p>The first stage of analysis is conducting a two-sample Kolmogorov–Smirnov test at a user defined significance level. The Kolmogorov–Smirnov test is a non-parametric statistical test that tests whether two features came from the same probability distribution. If a feature passes the test (i.e.&nbsp;the feature’s distribution is different from the benchmark distribution), then it passes onto the next stage of analysis. If a feature fails to pass the test (i.e.&nbsp;the feature’s distribution is identical to the benchmark distribution) then analysis on that feature is halted. The function also allows for the use of significance adjustment. If specified in the parameterization, the function will apply a Bonferroni significance adjustment on the p-values of the Kolmogorov–Smirnov test, where <strong>n</strong> is the number of numeric features being tested by the function. It should be noted that the Kolmogorov–Smirnov test is computationally robust, as one is able to leverage Spark Clusters to compute and compare cumulative density functions distributedly. This significantly reduces the time it would take for a single machine to calculate the test statistic and p-value derived from a Kolmogorov–Smirnov test.</p>
+<p>Due to the large nature of real-world datasets, the Kolmogorov–Smirnov test has a tendency to identify small changes in features that would typically be considered nonsubstantive. Consequently, it is necessary to analyze the effect size of differences detected by the Kolmogorov–Smirnov test. Robust, standard central differences are calculated for every feature that passes a Kolmogorov–Smirnov test, to quantify effect size in central tendency changes. The standard central differences calculated are modeled after Cohen’s d (standard mean difference), but utilize Harrell-Davis quantiles to compute median difference and a pooled, absolute median dispersion instead of a mean and pooled standard deviation (<a href="https://aakinshin.net/posts/nonparametric-effect-size/" class="external" target="_blank">Akinshin</a>).</p>
 <p><span class="math display">\[
 d = {{\bar{Y} - \bar{X} } \over {s}} \approx {{Q_{0.5}(Y) - Q_{0.5}(X)} \over {PMAD_{XY}}} = \gamma_{0.5}
 \]</span> This allows us to have an effect size measure that is resilient to feature shape and outliers. The effect size measures are compared to a user defined substantivity cutoff (function utilizes a 0.1 default, but recommends users to adjust for use case). If the effect size change for a feature exceeds the cutoff, the difference is labeled as substantive. Otherwise, differences are labeled as insubstantial.</p>
@@ -294,10 +294,10 @@ c(N) = 2H(n-1) - ({{2(n-1)} \over {n}})
 <p><span class="math display">\[
 H(x) = ln(x) + \gamma,
 \]</span></p>
-<p>where is Euler’s constant which can be substituted for an estimate of 0.5772156649. The anomaly score produced ranges from zero to one, with values closer to one being more anomalous. The isolation forest model uses an user defined value cut off, of which 0.5 was selected for this function.</p>
+<p>where <span class="math inline">\(\gamma\)</span> is Euler’s constant which can be substituted for an estimate of 0.5772156649. The anomaly score produced ranges from zero to one, with values closer to one being more anomalous. The isolation forest model uses an user defined value cut off, of which 0.5 was selected for this function.</p>
 <p><code>i.e. any data point with a score greater than or equal ot 0.5 was labeled as an anomaly</code></p>
-<p>Spark doesn’t have a native function for creating isolation forests. Therefore, the function utilizes Scikit-Learn to train and create the forest. This means that the forest has to be trained on a single node and be trained with flattened data. However, the function does distribute the “prediction” or assignment of anomaly scores. The function achieves distribution through a custom SQL user defined function that broadcasts a sklearn scaler and fit classifier. When the user defined function is called on a distributed data frame to create the scores, the scalar and classifier objects are copied and passed to each worker node within a cluster. This gives each worker node the capability to encode and calculate the anomaly score for any given data point. Since the calculations of scores are independent, each node is then able to calculate the scores for the data points within their own partition of the distributed data frame simultaneously to all the other nodes. For very large datasets, this distribution of calculation saves significant time on overall function run time. After anomaly scores are calculated, potential anomalous data points are counted by the function. The count of regular and anomalous data points are then outputted as a table for the user.</p>
-<p>Optionally, the function is also able to visualize multivariate outliers graphically. By performing principal component analysis on the features used to train the isolation forest, the function is able to calculate the first two principal components for every data point. Using these principal components as coordinates, the function graphs the points in a two-dimensional scatter plot where each data point is colored by its anomalous classification (normal/outlier). Graphing the data points allows data scientists to potentially identify clusters of anomalous data points. However, it should be noted that one should always consider the accounted variance of the principal components generated before accepting or rejecting the validity of the visualization. The data this function was tested on tended to preform well with principal component analysis, allowing for the first two principal components to regularly account for at least ninety-eight percent of explained variance.</p>
+<p>Spark doesn’t have a native function for creating isolation forests. Therefore, the function utilizes Scikit-Learn to train and create the forest. This means that the forest has to be trained on a single node and be trained with flattened data. However, the function does distribute the “prediction” or assignment of anomaly scores. The function achieves distribution through a custom SQL user defined function that broadcasts a sklearn scaler and fit classifier. When the user defined function is called on a distributed data frame to create the scores, the scalar and classifier objects are copied and passed to each worker node within a cluster. This gives each worker node the capability to encode and calculate the anomaly score for any given data point. Since the calculations of scores are independent, each node is then able to calculate the scores for the data points within their own partition of the distributed data frame simultaneously to all the other nodes. For very large datasets, this distribution of calculation significantly shortens overall function run time. After anomaly scores are calculated, potential anomalous data points are counted by the function. The count of regular and anomalous data points are then outputted as a table for the user.</p>
+<p>Optionally, the function is also able to visualize multivariate outliers graphically. By performing principal component analysis on the features used to train the isolation forest, the function is able to calculate the first two principal components for every data point. Using these principal components as coordinates, the function graphs the points in a two-dimensional scatter plot where each data point is colored by its anomalous classification (normal/outlier). Graphing the data points allows data scientists to potentially identify clusters of anomalous data points. However, it should be noted that one should always consider the accounted variance of the principal components generated before accepting or rejecting the validity of the visualization. The data this function was tested on tended to perform well with principal component analysis, allowing for the first two principal components to regularly account for at least ninety-eight percent of explained variance.</p>
 </section>
 <section id="summarizizng-by-group-functions-grouped-eda" class="level3">
 <h3 class="anchored" data-anchor-id="summarizizng-by-group-functions-grouped-eda">Summarizizng by Group Functions (Grouped EDA)</h3>
@@ -305,7 +305,7 @@ H(x) = ln(x) + \gamma,
 <p>Both functions achieve computational robustness by utilizing native Pyspark functions to calculate the grouped statistics and aggregates</p>
 <section id="summarizecategoricalbygroup" class="level4">
 <h4 class="anchored" data-anchor-id="summarizecategoricalbygroup">summarizeCategoricalByGroup</h4>
-<p>This function produces a table if counts and proportions of every category in a categorical feature by the grouping variable. If specified in parameterization, the function will also produce barcharts illustrating the proportion of the grouping levels in each category within a feature.</p>
+<p>This function produces a table of counts and proportions of every category in a categorical feature by the grouping variable. If specified in parameterization, the function will also produce barcharts illustrating the proportion of the grouping levels in each category within a feature.</p>
 </section>
 <section id="summarizenumericbygroup" class="level4">
 <h4 class="anchored" data-anchor-id="summarizenumericbygroup">summarizeNumericByGroup</h4>
@@ -314,7 +314,7 @@ H(x) = ln(x) + \gamma,
 </section>
 <section id="databrick-based-functions" class="level3">
 <h3 class="anchored" data-anchor-id="databrick-based-functions">Databrick Based Functions</h3>
-<p>These following function is useful for generating reports based if one with working within Databricks Notebooks and filesystem.</p>
+<p>These following function is useful for generating reports if one is working within Databricks Notebooks and filesystem.</p>
 <section id="lognotebook" class="level4">
 <h4 class="anchored" data-anchor-id="lognotebook">logNotebook</h4>
 <p>The logNotebook function allows a user to programmatically save Databrick notebook runs as rendered html documents to Databrick’s file system. The function can also either archive a link to the rendered document via MLflow or return the link as a Python string for alternative storage method.</p>
@@ -362,18 +362,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -405,7 +394,29 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
       var filterRegex = new RegExp('/' + window.location.host + '/');
@@ -413,7 +424,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
