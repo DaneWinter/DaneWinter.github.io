@@ -31,7 +31,7 @@ DATA <- read.csv("data/playfair_european_nations.csv")
 
 Recently in one of my data visualization classes, we were tasked with recreating a 19th century William Playfair Graph using modern day visualization software.
 
-William Playfair is credited as being one of the founders of the use of graphical methods in statistics. In his "Chart Representing the Extent, Population and Revenues of the Principal Nations in Europe," Playfair attempted  to visualize comparative taxation among the European nations, specifically trying to rely the story that England taxed more heavily than other European nations. Playfair even writes in supporting text that the graph “shows whether in proportion to its population the country is burdened with heavy taxes or otherwise.”
+William Playfair is credited as being one of the founders of the use of graphical methods in statistics. In his "Chart Representing the Extent, Population and Revenues of the Principal Nations in Europe," Playfair attempted to visualize comparative taxation among the European nations, specifically trying to rely the story that England taxed more heavily than other European nations. Playfair even writes in supporting text that the graph “shows whether in proportion to its population the country is burdened with heavy taxes or otherwise.”
 
 ![Playfair's Orginal Visualization](thumbnail.png)
 
@@ -41,26 +41,26 @@ Although not aiding in Playfair's goal of demonstrating unfair taxation, his use
 
 ## Re-creation
 
-In attempt to recreate the visualization using modern day software, I utilized R an the ggplot, ggthemes, and ggforce libraries. Ggplot does most of the heavy lifting for the visualization; however, ggthemes allows me to more closely match the original stylization of Playfair's chart, and ggforce has a circle geom for ggplot. It may be possible to recreate the chart without the use of ggforce's geom_circle, but it makes the task much simpler. 
+In attempt to recreate the visualization using modern day software, I utilized R an the ggplot, ggthemes, and ggforce libraries. Ggplot does most of the heavy lifting for the visualization; however, ggthemes allows me to more closely match the original stylization of Playfair's chart, and ggforce has a circle geom for ggplot. It may be possible to recreate the chart without the use of ggforce's geom_circle, but it makes the task much simpler.
 
 ### Data Preparation
 
 The first, and most important step in the recreation process was preparing the data. For the assignment, I was given a simple tidy dataframe that contained four columns of information:
 
-1.    Country Name
-2.    Country Area
-3.    Country Population
-4.    Country Taxation
+1.  Country Name
+2.  Country Area
+3.  Country Population
+4.  Country Taxation
 
 In order to properly map the elements of the graph I had to engineer:
 
-1.    Country Circle Radius
-2.    Scaled Country Circle Radius
-3.    Country Circle Center
-4.    Country Circle Labels
-5.    Label Adjustment/Padding
-6.    Country Faring Type (land/sea)
-7.    Plot Title with Proper Formatting
+1.  Country Circle Radius
+2.  Scaled Country Circle Radius
+3.  Country Circle Center
+4.  Country Circle Labels
+5.  Label Adjustment/Padding
+6.  Country Faring Type (land/sea)
+7.  Plot Title with Proper Formatting
 
 #### Data Preperation Code
 
@@ -116,7 +116,7 @@ After feature engineering and data preparation was complete, it became a manner 
 -   Dual, Repeated y-axis labels
 -   Color matching (the best I could) to the faded colors of the orignal
 -   Axis and element labels
- 
+
 #### Graphing Code & Final Reconstruction
 
 ```{r}
@@ -248,6 +248,3 @@ DATA %>%
 ```
 
 If I were to improve the visualization further I would change the font type/face. Serif fonts, especially in small sizes like shown in both the original and new graphic, are difficult to read. A sans serif font would be much easier for viewers to read. I would also remove the yellowed background as it holds no true purpose to the thesis, and I would change the title to be more concise. Lastly, I would take effort in drawing a viewers perception to Britain and Ireland's circle. Since the main thesis is to highlight it's peculiarity, I would leverage something to draw viewers' eyes towards the point (enclosing the circle in a red border or pointing a red arrow towards it are two ideas).
-
-
-
