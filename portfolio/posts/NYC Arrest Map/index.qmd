@@ -1,0 +1,20 @@
+---
+title: "N.Y.C. Arrest Map"
+author: "Dane Winterboer"
+date: "2024-12-2"
+categories: [Dashboard, Data Analyitcs, Data Visualization, Rshiny, R]
+image: "thumbnail.png"
+description: "Interactive Dashboard For N.Y.C. Arrest Data"
+---
+
+## Rshiny App: N.Y.C. Arrest Map
+
+[N.Y.C. Open Data](https://opendata.cityofnewyork.us/){target="_blank"} is one of my favorite repositories for open source data. New York City offices, agencies, and partners all publish open data on various categories that concern the happenings of the city, and the repository utilizes a very intuitive API system. As an example of just one potential application of N.Y.C. Open Data, I built an interactive crime map of the city using Rshiny.
+
+The application helps users explore N.Y.P.D. arrest patterns in New York City, using data to see how different types of crimes and arrests vary over time, location, and various demographic based factors. The application provides analytical freedom to users by allowing them to have control over various filters and controls of the application. Users can filter/select arrests by date range, crime severity, crime classification, perpetrator age group, perpetrator sex, and perpetrator race. This allows a user to search for trends within specific ranges of time and types of arrests. The application also allows a user to choose what qualitative variable they wish the map and marginal plot to be colored by, allowing for flexibility in qualitative analysis. Lastly, by using the select or lasso tool on the interactive map, a user can choose specific regions of the map to investigate. When an area is selected, the marginal plot and lollipop chart will update to only display information about the arrests in the selected area. This allows users to choose their area of analysis if they wish to be more granular than observing the entirety of New York City.
+
+The application was built using Rshiny and published on Shinyapps.io: one can access the application with the link bellow.
+
+[N.Y.C. Arrest Map](https://winterboer-dane.shinyapps.io/NYCCrimeApp/){target="_blank"}
+
+![](Photo.png)

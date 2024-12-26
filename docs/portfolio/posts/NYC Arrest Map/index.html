@@ -6,8 +6,11 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Dane Winterboer">
+<meta name="dcterms.date" content="2024-12-02">
+<meta name="description" content="Interactive Dashboard For N.Y.C. Arrest Data">
 
-<title>Portfolio – Dane Winterboer</title>
+<title>N.Y.C. Arrest Map – Dane Winterboer</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,24 +26,22 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<script src="../site_libs/quarto-listing/list.min.js"></script>
-<script src="../site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="../site_libs/quarto-html/quarto.js"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -68,77 +69,19 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
 
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../../../styles.css">
 </head>
 
-<body class="nav-fixed">
+<body class="nav-fixed fullcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../index.html">
+    <a class="navbar-brand" href="../../../index.html">
     <span class="navbar-title">Dane Winterboer</span>
     </a>
   </div>
@@ -149,21 +92,21 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="../portfolio/index.html" aria-current="page"> 
+    <a class="nav-link" href="../../../portfolio/index.html"> 
 <span class="menu-text">Portfolio</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../consulting/index.html"> 
+    <a class="nav-link" href="../../../consulting/index.html"> 
 <span class="menu-text">Consulting</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../cv/index.html"> 
+    <a class="nav-link" href="../../../cv/index.html"> 
 <span class="menu-text">Résumé</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html"> 
+    <a class="nav-link" href="../../../index.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
@@ -186,260 +129,67 @@ window.Quarto = {
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-page-left">
-      <h1 class="title">Portfolio</h1>
-                      </div>
+    <div class="quarto-title column-body">
+      <h1 class="title">N.Y.C. Arrest Map</h1>
+                  <div>
+        <div class="description">
+          Interactive Dashboard For N.Y.C. Arrest Data
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">Dashboard</div>
+                <div class="quarto-category">Data Analyitcs</div>
+                <div class="quarto-category">Data Visualization</div>
+                <div class="quarto-category">Rshiny</div>
+                <div class="quarto-category">R</div>
+              </div>
+                  </div>
   </div>
     
   
-  <div class="quarto-title-meta column-page-left">
+  <div class="quarto-title-meta">
 
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Dane Winterboer </p>
+            </div>
+    </div>
       
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">December 2, 2024</p>
+      </div>
+    </div>
     
       
     </div>
     
   
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(5)</span></div><div class="category" data-category="Competition">Competition <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Dashboard">Dashboard <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Data Analyitcs">Data Analyitcs <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Data Visualization">Data Visualization <span class="quarto-category-count">(3)</span></div><div class="category" data-category="Elevator Pitch">Elevator Pitch <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Entrepreneurship">Entrepreneurship <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Exploratory Analysis">Exploratory Analysis <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Feature Drift Detection">Feature Drift Detection <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Generative AI">Generative AI <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Machine Learning">Machine Learning <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Modeling">Modeling <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Pyspark">Pyspark <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Python">Python <span class="quarto-category-count">(1)</span></div><div class="category" data-category="R">R <span class="quarto-category-count">(3)</span></div><div class="category" data-category="Rshiny">Rshiny <span class="quarto-category-count">(1)</span></div><div class="category" data-category="ggplot">ggplot <span class="quarto-category-count">(1)</span></div></div></div>
+    
 <!-- main -->
-<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+<main class="content quarto-banner-title-block" id="quarto-document-content">
 
 
 
 
 
+<section id="rshiny-app-n.y.c.-arrest-map" class="level2">
+<h2 class="anchored" data-anchor-id="rshiny-app-n.y.c.-arrest-map">Rshiny App: N.Y.C. Arrest Map</h2>
+<p><a href="https://opendata.cityofnewyork.us/" target="_blank">N.Y.C. Open Data</a> is one of my favorite repositories for open source data. New York City offices, agencies, and partners all publish open data on various categories that concern the happenings of the city, and the repository utilizes a very intuitive API system. As an example of just one potential application of N.Y.C. Open Data, I built an interactive crime map of the city using Rshiny.</p>
+<p>The application helps users explore N.Y.P.D. arrest patterns in New York City, using data to see how different types of crimes and arrests vary over time, location, and various demographic based factors. The application provides analytical freedom to users by allowing them to have control over various filters and controls of the application. Users can filter/select arrests by date range, crime severity, crime classification, perpetrator age group, perpetrator sex, and perpetrator race. This allows a user to search for trends within specific ranges of time and types of arrests. The application also allows a user to choose what qualitative variable they wish the map and marginal plot to be colored by, allowing for flexibility in qualitative analysis. Lastly, by using the select or lasso tool on the interactive map, a user can choose specific regions of the map to investigate. When an area is selected, the marginal plot and lollipop chart will update to only display information about the arrests in the selected area. This allows users to choose their area of analysis if they wish to be more granular than observing the entirety of New York City.</p>
+<p>The application was built using Rshiny and published on Shinyapps.io: one can access the application with the link bellow.</p>
+<p><a href="https://winterboer-dane.shinyapps.io/NYCCrimeApp/" target="_blank">N.Y.C. Arrest Map</a></p>
+<p><img src="Photo.png" class="img-fluid"></p>
 
 
+</section>
 
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="Dashboard,Data Analyitcs,Data Visualization,Rshiny,R" data-listing-date-sort="1733119200000" data-listing-file-modified-sort="1735248420347" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="273">
-<div class="thumbnail">
-<p><a href="../portfolio/posts/NYC Arrest Map/index.html" class="no-external"></a></p><a href="../portfolio/posts/NYC Arrest Map/index.html" class="no-external">
-<p><img loading="lazy" src="../portfolio/posts/NYC Arrest Map/thumbnail.png" class="thumbnail-image"></p>
-</a><p><a href="../portfolio/posts/NYC Arrest Map/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../portfolio/posts/NYC Arrest Map/index.html" class="no-external">N.Y.C. Arrest Map</a>
-</h3>
-<div class="listing-subtitle">
-<a href="../portfolio/posts/NYC Arrest Map/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Dashboard'); return false;">
-Dashboard
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Data Analyitcs'); return false;">
-Data Analyitcs
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Data Visualization'); return false;">
-Data Visualization
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Rshiny'); return false;">
-Rshiny
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
-R
-</div>
-</div>
-<div class="listing-description">
-<a href="../portfolio/posts/NYC Arrest Map/index.html" class="no-external">Interactive Dashboard For N.Y.C. Arrest Data</a>
-</div>
-</div>
-<div class="metadata">
-<a href="../portfolio/posts/NYC Arrest Map/index.html" class="no-external">
-<div class="listing-date">
-Dec 2, 2024
-</div>
-<div class="listing-author">
-Dane Winterboer
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="Competition,Entrepreneurship,Generative AI,Elevator Pitch" data-listing-date-sort="1731564000000" data-listing-file-modified-sort="1735106136525" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="128">
-<div class="thumbnail">
-<p><a href="../portfolio/posts/BulldogBite/index.html" class="no-external"></a></p><a href="../portfolio/posts/BulldogBite/index.html" class="no-external">
-<p><img loading="lazy" src="../portfolio/posts/BulldogBite/thumbnail.jpg" class="thumbnail-image"></p>
-</a><p><a href="../portfolio/posts/BulldogBite/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../portfolio/posts/BulldogBite/index.html" class="no-external">Bulldog B.I.T.E. Building Innovation by Truman Entrepreneurs</a>
-</h3>
-<div class="listing-subtitle">
-<a href="../portfolio/posts/BulldogBite/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Competition'); return false;">
-Competition
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Entrepreneurship'); return false;">
-Entrepreneurship
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Generative AI'); return false;">
-Generative AI
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Elevator Pitch'); return false;">
-Elevator Pitch
-</div>
-</div>
-<div class="listing-description">
-<a href="../portfolio/posts/BulldogBite/index.html" class="no-external">Awarded First Place Prize in Annual Business Pitch Competition</a>
-</div>
-</div>
-<div class="metadata">
-<a href="../portfolio/posts/BulldogBite/index.html" class="no-external">
-<div class="listing-date">
-Nov 14, 2024
-</div>
-<div class="listing-author">
-Dane Winterboer
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-categories="R,ggplot,Data Visualization" data-listing-date-sort="1728536400000" data-listing-file-modified-sort="1735079863221" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="17" data-listing-word-count-sort="3245">
-<div class="thumbnail">
-<p><a href="../portfolio/posts/Playfair/index.html" class="no-external"></a></p><a href="../portfolio/posts/Playfair/index.html" class="no-external">
-<p><img loading="lazy" src="../portfolio/posts/Playfair/thumbnail.png" class="thumbnail-image"></p>
-</a><p><a href="../portfolio/posts/Playfair/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../portfolio/posts/Playfair/index.html" class="no-external">Reconstruction of 19th Century Data Visualization</a>
-</h3>
-<div class="listing-subtitle">
-<a href="../portfolio/posts/Playfair/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
-R
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('ggplot'); return false;">
-ggplot
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Data Visualization'); return false;">
-Data Visualization
-</div>
-</div>
-<div class="listing-description">
-<a href="../portfolio/posts/Playfair/index.html" class="no-external">A reconstruction and modernization of a 1801 William Playfair Graph.</a>
-</div>
-</div>
-<div class="metadata">
-<a href="../portfolio/posts/Playfair/index.html" class="no-external">
-<div class="listing-date">
-Oct 10, 2024
-</div>
-<div class="listing-author">
-Dane Winterboer
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="3" data-categories="Python,Pyspark,Machine Learning,Feature Drift Detection" data-listing-date-sort="1723266000000" data-listing-file-modified-sort="1734473426054" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="15" data-listing-word-count-sort="2808">
-<div class="thumbnail">
-<p><a href="../portfolio/posts/pysparkFeatureDrift/index.html" class="no-external"></a></p><a href="../portfolio/posts/pysparkFeatureDrift/index.html" class="no-external">
-<p><img loading="lazy" src="../portfolio/posts/pysparkFeatureDrift/thumbnail.png" class="thumbnail-image"></p>
-</a><p><a href="../portfolio/posts/pysparkFeatureDrift/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../portfolio/posts/pysparkFeatureDrift/index.html" class="no-external">Pyspark (Databricks) Library for Feature Drift Detection</a>
-</h3>
-<div class="listing-subtitle">
-<a href="../portfolio/posts/pysparkFeatureDrift/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
-Python
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Pyspark'); return false;">
-Pyspark
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Machine Learning'); return false;">
-Machine Learning
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Feature Drift Detection'); return false;">
-Feature Drift Detection
-</div>
-</div>
-<div class="listing-description">
-<a href="../portfolio/posts/pysparkFeatureDrift/index.html" class="no-external">A library of Pyspark functions that performs feature drift detection, grouped EDA, and other useful tasks in Databricks.</a>
-</div>
-</div>
-<div class="metadata">
-<a href="../portfolio/posts/pysparkFeatureDrift/index.html" class="no-external">
-<div class="listing-date">
-Aug 10, 2024
-</div>
-<div class="listing-author">
-Dane Winterboer
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="4" data-categories="R,Competition,Data Visualization,Machine Learning,Modeling,Exploratory Analysis" data-listing-date-sort="1712725200000" data-listing-file-modified-sort="1734818885362" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="31" data-listing-word-count-sort="6095">
-<div class="thumbnail">
-<p><a href="../portfolio/posts/datafest (2024)/index.html" class="no-external"></a></p><a href="../portfolio/posts/datafest (2024)/index.html" class="no-external">
-<p><img loading="lazy" src="../portfolio/posts/datafest (2024)/thumbnail.png" class="thumbnail-image"></p>
-</a><p><a href="../portfolio/posts/datafest (2024)/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../portfolio/posts/datafest (2024)/index.html" class="no-external">Mizzou Datafest 2024: Best-in-Show Submission</a>
-</h3>
-<div class="listing-subtitle">
-<a href="../portfolio/posts/datafest (2024)/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
-R
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Competition'); return false;">
-Competition
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Data Visualization'); return false;">
-Data Visualization
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Machine Learning'); return false;">
-Machine Learning
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Modeling'); return false;">
-Modeling
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Exploratory Analysis'); return false;">
-Exploratory Analysis
-</div>
-</div>
-<div class="listing-description">
-<a href="../portfolio/posts/datafest (2024)/index.html" class="no-external">An Analysis of Student Success Indicators in CourseKata Online Textbooks</a>
-</div>
-</div>
-<div class="metadata">
-<a href="../portfolio/posts/datafest (2024)/index.html" class="no-external">
-<div class="listing-date">
-Apr 10, 2024
-</div>
-<div class="listing-author">
-Dane Winterboer
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
