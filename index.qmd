@@ -14,4 +14,4 @@ about:
       target: _blank
 ---
 
-I am a current senior at Truman State University studying Statistics and Data Science. I have always had an affinity and deep curiosity for computers, data, and problem solving. I am currently pursing career opportunities in in data science, analytics, and engineering as I find the work exciting and rewarding.
+I am a current senior at Truman State University studying Statistics and Data Science. I have always had an affinity and deep curiosity for computers, data, and problem solving. I am currently pursuing career opportunities in data science, analytics, and engineering as I find the work exciting and rewarding.
